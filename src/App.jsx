@@ -68,7 +68,7 @@ function DancerBackground() {
     <img
       src={imgUrl}
       alt="Bharatanatyam dancer pose"
-      className="hidden md:block fixed right-0 top-0 h-full w-auto z-10 opacity-25 pointer-events-none mix-blend-multiply grayscale contrast-125 blur-[1px] object-cover"
+      className="hidden md:block fixed right-[-10vw] top-0 h-full w-auto z-10 opacity-25 pointer-events-none mix-blend-multiply grayscale contrast-125 blur-[1px] object-cover"
       style={{
         filter: 'grayscale(1) contrast(1.2) brightness(1.1) blur(1px)',
         WebkitMaskImage: 'radial-gradient(ellipse 60% 80% at 60% 50%, white 80%, transparent 100%)',
@@ -93,11 +93,11 @@ function FloatingMudra() {
   return (
     <motion.div
       className="hidden md:block fixed z-10 opacity-20 blur-xs pointer-events-none select-none"
-      style={{ left: '1vw', top: '6vh', width: '8rem', height: '8rem' }}
+      style={{ left: '1vw', top: '6vh', width: '11rem', height: '11rem' }}
       animate={{ x: pos.x, y: pos.y, rotate: [0, 12, -10, 0] }}
       transition={{ x: { duration: 2.5 }, y: { duration: 2.5 }, rotate: { duration: 6, repeat: Infinity } }}
     >
-      <div className="w-full h-full bg-pink-300 rounded-full flex items-center justify-center text-4xl font-bold">🤲</div>
+      <span className="w-full h-full flex items-center justify-center text-7xl">🤲</span>
     </motion.div>
   );
 }
@@ -117,11 +117,11 @@ function FloatingLotus() {
   return (
     <motion.div
       className="hidden md:block fixed z-10 opacity-20 blur-xs pointer-events-none select-none"
-      style={{ right: '2vw', bottom: '7vh', width: '9rem', height: '9rem' }}
+      style={{ right: '2vw', bottom: '7vh', width: '12rem', height: '12rem' }}
       animate={{ x: pos.x, y: pos.y, rotate: [0, -14, 10, 0] }}
       transition={{ x: { duration: 2.8 }, y: { duration: 2.8 }, rotate: { duration: 7, repeat: Infinity } }}
     >
-      <div className="w-full h-full bg-purple-200 rounded-full flex items-center justify-center text-5xl font-bold">🌸</div>
+      <span className="w-full h-full flex items-center justify-center text-8xl">🌸</span>
     </motion.div>
   );
 }
@@ -141,11 +141,11 @@ function FloatingLamp() {
   return (
     <motion.div
       className="hidden md:block fixed z-10 opacity-20 blur-xs pointer-events-none select-none"
-      style={{ right: '3vw', top: '8vh', width: '7.5rem', height: '7.5rem' }}
+      style={{ right: '3vw', top: '8vh', width: '10rem', height: '10rem' }}
       animate={{ x: pos.x, y: pos.y, rotate: [0, 10, -12, 0] }}
       transition={{ x: { duration: 2.7 }, y: { duration: 2.7 }, rotate: { duration: 6.5, repeat: Infinity } }}
     >
-      <div className="w-full h-full bg-yellow-200 rounded-full flex items-center justify-center text-4xl font-bold">🪔</div>
+      <span className="w-full h-full flex items-center justify-center text-7xl">🪔</span>
     </motion.div>
   );
 }
@@ -265,7 +265,7 @@ function App() {
         <DancerBackground />
         <div className="relative z-20">
           {/* Navbar */}
-          <nav className="fixed top-0 left-0 w-full flex items-center justify-between px-6 py-4 bg-gradient-to-b from-white via-pink-50 to-orange-50 shadow-md z-50">
+          <nav className="fixed top-0 left-0 w-full flex items-center justify-between px-6 py-4 bg-gradient-to-b from-pink-50 via-orange-100 to-white shadow-md z-50">
             <div className="flex items-center gap-3">
               <img src="/logo.png" alt="TandavaLasya Logo" className="w-10 h-10 rounded-full object-contain bg-white shadow-lg" />
               <span className="font-extrabold text-lg tracking-wide">TandavaLasya</span>
