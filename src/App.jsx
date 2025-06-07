@@ -132,7 +132,7 @@ function FloatingMudra() {
   useEffect(() => {
     let timeout;
     function move() {
-      setPos({ x: Math.random() * 120, y: Math.random() * 180 });
+      setPos({ x: Math.random() * 60, y: Math.random() * 80 });
       timeout = setTimeout(move, 3500 + Math.random() * 1200);
     }
     move();
@@ -140,8 +140,8 @@ function FloatingMudra() {
   }, []);
   return (
     <motion.div
-      className="hidden md:block fixed z-10 opacity-20 blur-xs pointer-events-none select-none"
-      style={{ left: '1vw', bottom: '7vh', width: '11rem', height: '11rem' }}
+      className="hidden md:block fixed z-40 opacity-20 blur-xs pointer-events-none select-none"
+      style={{ left: '8vw', bottom: '6.5rem', width: '11rem', height: '11rem' }}
       animate={{ x: pos.x, y: pos.y, rotate: [0, 12, -10, 0] }}
       transition={{ x: { duration: 2.5 }, y: { duration: 2.5 }, rotate: { duration: 6, repeat: Infinity } }}
     >
@@ -156,7 +156,7 @@ function FloatingLamp() {
   useEffect(() => {
     let timeout;
     function move() {
-      setPos({ x: Math.random() * 120, y: Math.random() * 140 });
+      setPos({ x: Math.random() * 60, y: Math.random() * 60 });
       timeout = setTimeout(move, 4200 + Math.random() * 1200);
     }
     move();
@@ -164,8 +164,8 @@ function FloatingLamp() {
   }, []);
   return (
     <motion.div
-      className="hidden md:block fixed z-10 opacity-20 blur-xs pointer-events-none select-none"
-      style={{ right: '3vw', bottom: '8vh', width: '10rem', height: '10rem' }}
+      className="hidden md:block fixed z-40 opacity-20 blur-xs pointer-events-none select-none"
+      style={{ right: '8vw', bottom: '6.5rem', width: '10rem', height: '10rem' }}
       animate={{ x: pos.x, y: pos.y, rotate: [0, 10, -12, 0] }}
       transition={{ x: { duration: 2.7 }, y: { duration: 2.7 }, rotate: { duration: 6.5, repeat: Infinity } }}
     >
