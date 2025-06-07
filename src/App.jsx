@@ -10,6 +10,7 @@ import Blog from './pages/Blog';
 import Schedule from './pages/Schedule';
 import Contact from './pages/Contact';
 import BlogPost from './pages/BlogPost';
+import GalleryEventDetail from './pages/GalleryEventDetail';
 import './App.css'
 
 const navLinks = [
@@ -28,6 +29,7 @@ function AnimatedRoutes() {
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.4 }}><Home /></motion.div>} />
         <Route path="/gallery" element={<motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.4 }}><Gallery /></motion.div>} />
+        <Route path="/gallery/:slug" element={<motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.4 }}><GalleryEventDetail /></motion.div>} />
         <Route path="/about" element={<motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.4 }}><About /></motion.div>} />
         <Route path="/blog" element={<motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.4 }}><Blog /></motion.div>} />
         <Route path="/blog/:slug" element={<motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.4 }}><BlogPost /></motion.div>} />

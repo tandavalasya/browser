@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import ReactMarkdown from 'react-markdown';
+import { Link } from 'react-router-dom';
 import galleryEvents from '../posts/galleryEvents';
 
 const tabs = ["Events"];
@@ -50,15 +50,14 @@ const Gallery = () => {
               whileHover={{ scale: 1.03 }}
               exit={{ opacity: 0, y: 30 }}
             >
-              <img src={event.image} alt={event.title} className="h-48 w-full object-cover group-hover:scale-105 transition-transform duration-300" />
-              <div className="p-6 flex-1 flex flex-col">
-                <h3 className="text-2xl font-bold mb-2 text-pink-600 group-hover:text-pink-700 transition-colors">{event.title}</h3>
-                <p className="text-sm text-gray-400 mb-2">{event.date}</p>
-                <p className="text-gray-700 mb-4 flex-1">{event.excerpt}</p>
-                <div className="prose prose-pink max-w-none text-sm mt-2">
-                  <ReactMarkdown>{event.content}</ReactMarkdown>
+              <Link to={`/gallery/${event.slug}`} className="flex flex-col h-full">
+                <img src={event.image} alt={event.title} className="h-48 w-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                <div className="p-6 flex-1 flex flex-col">
+                  <h3 className="text-2xl font-bold mb-2 text-pink-600 group-hover:text-pink-700 transition-colors">{event.title}</h3>
+                  <p className="text-sm text-gray-400 mb-2">{event.date}</p>
+                  <p className="text-gray-700 mb-4 flex-1">{event.excerpt}</p>
                 </div>
-              </div>
+              </Link>
             </motion.div>
           ))}
         </AnimatePresence>
