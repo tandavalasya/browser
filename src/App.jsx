@@ -68,11 +68,11 @@ function DancerBackground() {
     <img
       src={imgUrl}
       alt="Bharatanatyam dancer pose"
-      className="hidden md:block fixed right-0 top-0 h-full w-auto z-10 opacity-28 pointer-events-none mix-blend-multiply contrast-110 blur-[3px] object-cover"
+      className="hidden md:block fixed right-0 top-0 h-full w-auto z-10 opacity-25 pointer-events-none mix-blend-multiply grayscale contrast-125 blur-[1px] object-cover"
       style={{
-        filter: 'contrast(1.1) brightness(1.08) blur(3px)',
-        WebkitMaskImage: 'radial-gradient(ellipse 45% 70% at 65% 55%, white 80%, transparent 100%)',
-        maskImage: 'radial-gradient(ellipse 45% 70% at 65% 55%, white 80%, transparent 100%)',
+        filter: 'grayscale(1) contrast(1.2) brightness(1.1) blur(1px)',
+        WebkitMaskImage: 'radial-gradient(ellipse 60% 80% at 60% 50%, white 80%, transparent 100%)',
+        maskImage: 'radial-gradient(ellipse 60% 80% at 60% 50%, white 80%, transparent 100%)',
       }}
     />
   );
