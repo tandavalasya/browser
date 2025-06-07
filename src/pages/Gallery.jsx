@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
+import galleryEvents from '../posts/galleryEvents';
 
-const tabs = ["Events", "Student Performances", "Workshops"];
+const tabs = ["Events"];
 
 const containerVariants = {
   hidden: {},
@@ -34,26 +36,33 @@ const Gallery = () => {
         ))}
       </div>
       <motion.div
-        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"
+        className="grid gap-8 md:grid-cols-2"
         variants={containerVariants}
         initial="hidden"
         animate="show"
       >
         <AnimatePresence>
-          {[...Array(6)].map((_, i) => (
+          {galleryEvents.map((event) => (
             <motion.div
-              key={i}
-              className="aspect-square bg-gradient-to-tr from-orange-200 to-pink-200 rounded-xl flex items-center justify-center text-2xl font-bold text-pink-500 shadow-md"
+              key={event.slug}
+              className="group bg-white rounded-xl shadow-md p-0 hover:shadow-xl transition-shadow duration-300 flex flex-col overflow-hidden cursor-pointer"
               variants={itemVariants}
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.03 }}
               exit={{ opacity: 0, y: 30 }}
             >
-              Media {i + 1}
+              <img src={event.image} alt={event.title} className="h-48 w-full object-cover group-hover:scale-105 transition-transform duration-300" />
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-2xl font-bold mb-2 text-pink-600 group-hover:text-pink-700 transition-colors">{event.title}</h3>
+                <p className="text-sm text-gray-400 mb-2">{event.date}</p>
+                <p className="text-gray-700 mb-4 flex-1">{event.excerpt}</p>
+                <div className="prose prose-pink max-w-none text-sm mt-2">
+                  <ReactMarkdown>{event.content}</ReactMarkdown>
+                </div>
+              </div>
             </motion.div>
           ))}
         </AnimatePresence>
       </motion.div>
-      <p className="mt-8 text-center text-gray-500">(Your event photos and videos will appear here!)</p>
     </section>
   );
 };
