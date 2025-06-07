@@ -63,7 +63,7 @@ function NavLinkAnimated({ to, children }) {
 }
 
 function DancerBackground() {
-  const imgUrl = 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80';
+  const imgUrl = 'https://www.tandavalasya.com/static/b6c8c7fa13bb61de3cf6a6c3448d4535/bfa06/0072.webp';
   return (
     <img
       src={imgUrl}
