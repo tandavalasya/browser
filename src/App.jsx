@@ -217,6 +217,30 @@ function ThoranamGarland() {
   );
 }
 
+function FloatingSalangai() {
+  // Left bottom
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  useEffect(() => {
+    let timeout;
+    function move() {
+      setPos({ x: Math.random() * 100, y: Math.random() * 100 });
+      timeout = setTimeout(move, 4000 + Math.random() * 1200);
+    }
+    move();
+    return () => clearTimeout(timeout);
+  }, []);
+  return (
+    <motion.div
+      className="hidden md:block fixed z-10 opacity-20 blur-xs pointer-events-none select-none"
+      style={{ left: '2vw', bottom: '7vh', width: '10rem', height: '10rem' }}
+      animate={{ x: pos.x, y: pos.y, rotate: [0, 10, -12, 0] }}
+      transition={{ x: { duration: 2.7 }, y: { duration: 2.7 }, rotate: { duration: 6.5, repeat: Infinity } }}
+    >
+      <span className="w-full h-full flex items-center justify-center text-7xl">🔔</span>
+    </motion.div>
+  );
+}
+
 function Footer() {
   return (
     <footer className="fixed bottom-0 left-0 w-full bg-gradient-to-r from-pink-200 via-orange-100 to-blue-100 text-gray-700 py-4 px-4 border-t border-pink-200 z-50">
@@ -296,6 +320,7 @@ function App() {
         <FloatingMudra />
         <FloatingLotus />
         <FloatingLamp />
+        <FloatingSalangai />
         <ThoranamGarland />
       </div>
     </Router>
