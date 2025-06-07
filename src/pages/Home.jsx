@@ -14,7 +14,7 @@ const Home = () => (
       animate={{ scale: [1, 1.08, 1] }}
       transition={{ repeat: Infinity, duration: 2 }}
     >
-      <img src="/logo.png" alt="TandavaLasya Logo" className="w-28 h-28 object-contain" />
+      <img src="/logo.png" alt="TandavaLasya Logo" className="w-28 h-28 object-contain drop-shadow-sm" />
     </motion.div>
     <h1 className="text-4xl md:text-6xl font-extrabold mb-4 tracking-tight drop-shadow-lg">TandavaLasya</h1>
     <h2 className="text-xl md:text-2xl font-semibold mb-6 text-pink-700">Bharatanatyam Dance School</h2>
