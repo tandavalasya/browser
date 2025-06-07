@@ -78,32 +78,8 @@ function DancerBackground() {
   );
 }
 
-function FloatingMudra() {
-  // Top left
-  const [pos, setPos] = useState({ x: 0, y: 0 });
-  useEffect(() => {
-    let timeout;
-    function move() {
-      setPos({ x: Math.random() * 120, y: Math.random() * 180 });
-      timeout = setTimeout(move, 3500 + Math.random() * 1200);
-    }
-    move();
-    return () => clearTimeout(timeout);
-  }, []);
-  return (
-    <motion.div
-      className="hidden md:block fixed z-10 opacity-20 blur-xs pointer-events-none select-none"
-      style={{ left: '1vw', top: '6vh', width: '11rem', height: '11rem' }}
-      animate={{ x: pos.x, y: pos.y, rotate: [0, 12, -10, 0] }}
-      transition={{ x: { duration: 2.5 }, y: { duration: 2.5 }, rotate: { duration: 6, repeat: Infinity } }}
-    >
-      <span className="w-full h-full flex items-center justify-center text-7xl">🤲</span>
-    </motion.div>
-  );
-}
-
 function FloatingLotus() {
-  // Bottom right
+  // Top right (was bottom right)
   const [pos, setPos] = useState({ x: 0, y: 0 });
   useEffect(() => {
     let timeout;
@@ -117,7 +93,7 @@ function FloatingLotus() {
   return (
     <motion.div
       className="hidden md:block fixed z-10 opacity-20 blur-xs pointer-events-none select-none"
-      style={{ right: '2vw', bottom: '7vh', width: '12rem', height: '12rem' }}
+      style={{ right: '2vw', top: '6vh', width: '12rem', height: '12rem' }}
       animate={{ x: pos.x, y: pos.y, rotate: [0, -14, 10, 0] }}
       transition={{ x: { duration: 2.8 }, y: { duration: 2.8 }, rotate: { duration: 7, repeat: Infinity } }}
     >
@@ -126,8 +102,56 @@ function FloatingLotus() {
   );
 }
 
+function FloatingSalangai() {
+  // Top left (was bottom left)
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  useEffect(() => {
+    let timeout;
+    function move() {
+      setPos({ x: Math.random() * 100, y: Math.random() * 100 });
+      timeout = setTimeout(move, 4000 + Math.random() * 1200);
+    }
+    move();
+    return () => clearTimeout(timeout);
+  }, []);
+  return (
+    <motion.div
+      className="hidden md:block fixed z-10 opacity-20 blur-xs pointer-events-none select-none"
+      style={{ left: '2vw', top: '7vh', width: '10rem', height: '10rem' }}
+      animate={{ x: pos.x, y: pos.y, rotate: [0, 10, -12, 0] }}
+      transition={{ x: { duration: 2.7 }, y: { duration: 2.7 }, rotate: { duration: 6.5, repeat: Infinity } }}
+    >
+      <span className="w-full h-full flex items-center justify-center text-7xl">🔔</span>
+    </motion.div>
+  );
+}
+
+function FloatingMudra() {
+  // Bottom left (was top left)
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  useEffect(() => {
+    let timeout;
+    function move() {
+      setPos({ x: Math.random() * 120, y: Math.random() * 180 });
+      timeout = setTimeout(move, 3500 + Math.random() * 1200);
+    }
+    move();
+    return () => clearTimeout(timeout);
+  }, []);
+  return (
+    <motion.div
+      className="hidden md:block fixed z-10 opacity-20 blur-xs pointer-events-none select-none"
+      style={{ left: '1vw', bottom: '7vh', width: '11rem', height: '11rem' }}
+      animate={{ x: pos.x, y: pos.y, rotate: [0, 12, -10, 0] }}
+      transition={{ x: { duration: 2.5 }, y: { duration: 2.5 }, rotate: { duration: 6, repeat: Infinity } }}
+    >
+      <span className="w-full h-full flex items-center justify-center text-7xl">🤲</span>
+    </motion.div>
+  );
+}
+
 function FloatingLamp() {
-  // Top right
+  // Bottom right (was top right)
   const [pos, setPos] = useState({ x: 0, y: 0 });
   useEffect(() => {
     let timeout;
@@ -141,7 +165,7 @@ function FloatingLamp() {
   return (
     <motion.div
       className="hidden md:block fixed z-10 opacity-20 blur-xs pointer-events-none select-none"
-      style={{ right: '3vw', top: '8vh', width: '10rem', height: '10rem' }}
+      style={{ right: '3vw', bottom: '8vh', width: '10rem', height: '10rem' }}
       animate={{ x: pos.x, y: pos.y, rotate: [0, 10, -12, 0] }}
       transition={{ x: { duration: 2.7 }, y: { duration: 2.7 }, rotate: { duration: 6.5, repeat: Infinity } }}
     >
@@ -214,30 +238,6 @@ function ThoranamGarland() {
         );
       })}
     </motion.svg>
-  );
-}
-
-function FloatingSalangai() {
-  // Left bottom
-  const [pos, setPos] = useState({ x: 0, y: 0 });
-  useEffect(() => {
-    let timeout;
-    function move() {
-      setPos({ x: Math.random() * 100, y: Math.random() * 100 });
-      timeout = setTimeout(move, 4000 + Math.random() * 1200);
-    }
-    move();
-    return () => clearTimeout(timeout);
-  }, []);
-  return (
-    <motion.div
-      className="hidden md:block fixed z-10 opacity-20 blur-xs pointer-events-none select-none"
-      style={{ left: '2vw', bottom: '7vh', width: '10rem', height: '10rem' }}
-      animate={{ x: pos.x, y: pos.y, rotate: [0, 10, -12, 0] }}
-      transition={{ x: { duration: 2.7 }, y: { duration: 2.7 }, rotate: { duration: 6.5, repeat: Infinity } }}
-    >
-      <span className="w-full h-full flex items-center justify-center text-7xl">🔔</span>
-    </motion.div>
   );
 }
 
@@ -317,10 +317,10 @@ function App() {
           </main>
           <Footer />
         </div>
-        <FloatingMudra />
         <FloatingLotus />
-        <FloatingLamp />
         <FloatingSalangai />
+        <FloatingMudra />
+        <FloatingLamp />
         <ThoranamGarland />
       </div>
     </Router>
