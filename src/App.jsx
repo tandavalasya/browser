@@ -202,8 +202,8 @@ function ThoranamGarland() {
   });
   return (
     <motion.svg
-      className="fixed left-0 right-0 top-16 w-full h-20 md:h-28 z-10 opacity-20 blur-xs pointer-events-none select-none"
-      viewBox="0 0 1300 120"
+      className="fixed left-0 right-0 top-28 w-full h-28 md:h-36 z-10 opacity-20 blur-xs pointer-events-none select-none"
+      viewBox="0 0 1300 180"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       animate={{
@@ -268,7 +268,7 @@ function App() {
         <DancerBackground />
         <div className="relative z-20">
           {/* Navbar */}
-          <nav className="fixed top-0 left-0 w-full flex items-center justify-between px-6 py-4 bg-white shadow-md z-50">
+          <nav className="fixed top-0 left-0 w-full flex items-center justify-between px-6 py-4 bg-gradient-to-b from-white via-pink-50 to-orange-50 shadow-md z-50">
             <div className="flex items-center gap-3">
               <img src="/logo.png" alt="TandavaLasya Logo" className="w-10 h-10 rounded-full object-contain bg-white shadow-lg" />
               <span className="font-extrabold text-lg tracking-wide">TandavaLasya</span>
