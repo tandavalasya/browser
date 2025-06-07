@@ -312,11 +312,7 @@ function App() {
         <FloatingLamp />
         <FloatingSalangai />
         <ThoranamGarland />
-        {/* Overlay for readability */}
-        <div className="fixed inset-0 z-20 pointer-events-none">
-          <div className="absolute inset-0 bg-white/90 backdrop-blur-sm" />
-        </div>
-        <div className="relative z-30 min-h-screen flex flex-col">
+        <div className="relative min-h-screen flex flex-col">
           <div className="flex-1">
             <AnimatedRoutes />
           </div>
