@@ -181,6 +181,22 @@ function FloatingSalangai() {
 // Modern Thoranam/Salangai Garland Motif
 function ThoranamGarland() {
   const bellCount = 13;
+  // Helper to get y on the rope path for a given x
+  function getRopeY(x) {
+    // Rope is a cubic Bezier: M30 40 Q325 140 650 40 Q975 -60 1270 40
+    // We'll approximate with two quadratic segments
+    if (x <= 650) {
+      // First segment: (30,40) Q(325,140) (650,40)
+      const t = (x - 30) / (650 - 30);
+      const y = (1 - t) * (1 - t) * 40 + 2 * (1 - t) * t * 140 + t * t * 40;
+      return y;
+    } else {
+      // Second segment: (650,40) Q(975,-60) (1270,40)
+      const t = (x - 650) / (1270 - 650);
+      const y = (1 - t) * (1 - t) * 40 + 2 * (1 - t) * t * -60 + t * t * 40;
+      return y;
+    }
+  }
   return (
     <motion.svg
       className="fixed left-0 right-0 top-16 w-full h-20 md:h-28 z-10 opacity-20 blur-xs pointer-events-none select-none"
@@ -199,12 +215,12 @@ function ThoranamGarland() {
       {/* Stylized bells */}
       {Array.from({ length: bellCount }).map((_, i) => {
         const x = 30 + i * ((1270 - 30) / (bellCount - 1));
-        const y =
-          i < bellCount / 2
-            ? 40 + (i * 10)
-            : 40 + ((bellCount - 1 - i) * 10);
+        const y = getRopeY(x);
         return (
           <g key={i}>
+            {/* Bell string */}
+            <rect x={x - 1} y={y} width="2" height="18" rx="1" fill="#b45309" />
+            {/* Bell */}
             <motion.circle
               cx={x}
               cy={y + 18}
@@ -218,9 +234,7 @@ function ThoranamGarland() {
               transition={{ repeat: Infinity, duration: 8 + i, ease: 'easeInOut' }}
             />
             {/* Bell highlight */}
-            <circle cx={x + 4} cy={y + 13} r="2" fill="#fff" />
-            {/* Bell string */}
-            <rect x={x - 1} y={y + 4} width="2" height="13" rx="1" fill="#b45309" />
+            <circle cx={x + 4} cy={y + 13 + 8} r="2" fill="#fff" />
           </g>
         );
       })}
