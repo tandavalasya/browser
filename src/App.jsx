@@ -150,31 +150,6 @@ function FloatingLamp() {
   );
 }
 
-function FloatingSalangai() {
-  // Left bottom
-  const [pos, setPos] = useState({ x: 0, y: 0 });
-  useEffect(() => {
-    let timeout;
-    function move() {
-      setPos({ x: Math.random() * 40, y: Math.random() * 60 });
-      timeout = setTimeout(move, 6500 + Math.random() * 2000);
-    }
-    move();
-    return () => clearTimeout(timeout);
-  }, []);
-  return (
-    <motion.div
-      className="hidden md:block fixed z-10 opacity-20 blur-xs pointer-events-none select-none"
-      style={{ left: '4vw', bottom: '10vh', width: '4.5rem', height: '4.5rem' }}
-      animate={{ x: pos.x, y: pos.y }}
-      transition={{ x: { duration: 3.2 }, y: { duration: 3.2 } }}
-    >
-      {/* Placeholder Salangai SVG */}
-      <div className="w-full h-full bg-yellow-300 rounded-full flex items-center justify-center text-2xl font-bold">🔔</div>
-    </motion.div>
-  );
-}
-
 // Modern Thoranam/Salangai Garland Motif
 function ThoranamGarland() {
   const bellCount = 13;
@@ -265,7 +240,7 @@ function App() {
         <DancerBackground />
         <div className="relative z-20">
           {/* Navbar */}
-          <nav className="fixed top-0 left-0 w-full flex items-center justify-between px-6 py-4 bg-gradient-to-b from-pink-50 via-orange-100 to-white shadow-md z-50">
+          <nav className="fixed top-0 left-0 w-full flex items-center justify-between px-6 py-4 bg-white/70 backdrop-blur-md border-b border-pink-200 shadow-lg rounded-b-2xl z-50">
             <div className="flex items-center gap-3">
               <img src="/logo.png" alt="TandavaLasya Logo" className="w-10 h-10 rounded-full object-contain bg-white shadow-lg" />
               <span className="font-extrabold text-lg tracking-wide">TandavaLasya</span>
@@ -321,7 +296,6 @@ function App() {
         <FloatingMudra />
         <FloatingLotus />
         <FloatingLamp />
-        <FloatingSalangai />
         <ThoranamGarland />
       </div>
     </Router>
