@@ -10,11 +10,11 @@ const Home = () => (
     transition={{ duration: 0.7 }}
   >
     <motion.div
-      className="w-24 h-24 rounded-full bg-gradient-to-tr from-pink-400 to-orange-400 flex items-center justify-center text-white font-extrabold text-4xl mb-4 shadow-xl"
+      className="w-24 h-24 rounded-full bg-white flex items-center justify-center mb-4 shadow-xl"
       animate={{ scale: [1, 1.1, 1] }}
       transition={{ repeat: Infinity, duration: 2 }}
     >
-      TL
+      <img src="/logo.png" alt="TandavaLasya Logo" className="w-20 h-20 object-contain" />
     </motion.div>
     <h1 className="text-4xl md:text-6xl font-extrabold mb-4 tracking-tight drop-shadow-lg">TandavaLasya</h1>
     <h2 className="text-xl md:text-2xl font-semibold mb-6 text-pink-700">Bharatanatyam Dance School</h2>
