@@ -251,7 +251,7 @@ function App() {
         <DancerBackground />
         <div className="relative z-20">
           {/* Navbar */}
-          <nav className="fixed top-0 left-0 w-full flex items-center justify-between px-6 py-4 bg-white bg-opacity-80 shadow-md z-50">
+          <nav className="fixed top-0 left-0 w-full flex items-center justify-between px-6 py-4 bg-white shadow-md z-50">
             <div className="flex items-center gap-3">
               {/* Placeholder Logo */}
               <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-pink-400 to-orange-400 flex items-center justify-center text-white font-bold text-xl shadow-lg">
