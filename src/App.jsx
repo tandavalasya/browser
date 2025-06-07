@@ -183,20 +183,23 @@ function ThoranamGarland() {
   const bellCount = 13;
   // Helper to get y on the rope path for a given x
   function getRopeY(x) {
-    // Rope is a cubic Bezier: M30 40 Q325 140 650 40 Q975 -60 1270 40
-    // We'll approximate with two quadratic segments
     if (x <= 650) {
-      // First segment: (30,40) Q(325,140) (650,40)
       const t = (x - 30) / (650 - 30);
       const y = (1 - t) * (1 - t) * 40 + 2 * (1 - t) * t * 140 + t * t * 40;
       return y;
     } else {
-      // Second segment: (650,40) Q(975,-60) (1270,40)
       const t = (x - 650) / (1270 - 650);
       const y = (1 - t) * (1 - t) * 40 + 2 * (1 - t) * t * -60 + t * t * 40;
       return y;
     }
   }
+  // Draw beaded/dashed line along the path
+  const beadCount = 40;
+  const beads = Array.from({ length: beadCount }).map((_, i) => {
+    const x = 30 + i * ((1270 - 30) / (beadCount - 1));
+    const y = getRopeY(x);
+    return <circle key={i} cx={x} cy={y} r="4" fill="#b91c1c" stroke="#fff" strokeWidth="1.5" />;
+  });
   return (
     <motion.svg
       className="fixed left-0 right-0 top-16 w-full h-20 md:h-28 z-10 opacity-20 blur-xs pointer-events-none select-none"
@@ -210,8 +213,8 @@ function ThoranamGarland() {
       transition={{ repeat: Infinity, duration: 13, ease: 'easeInOut' }}
       style={{ maxWidth: '100vw' }}
     >
-      {/* Modern garland rope */}
-      <path d="M30 40 Q325 140 650 40 Q975 -60 1270 40" stroke="#b91c1c" strokeWidth="10" fill="none" />
+      {/* Beaded salangai-like path */}
+      {beads}
       {/* Stylized bells */}
       {Array.from({ length: bellCount }).map((_, i) => {
         const x = 30 + i * ((1270 - 30) / (bellCount - 1));
