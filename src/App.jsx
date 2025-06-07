@@ -312,12 +312,6 @@ function App() {
         <FloatingLamp />
         <FloatingSalangai />
         <ThoranamGarland />
-        <div className="relative min-h-screen flex flex-col">
-          <div className="flex-1">
-            <AnimatedRoutes />
-          </div>
-          <Footer />
-        </div>
       </div>
     </Router>
   );
