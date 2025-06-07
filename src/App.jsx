@@ -84,8 +84,8 @@ function FloatingMudra() {
   useEffect(() => {
     let timeout;
     function move() {
-      setPos({ x: Math.random() * 40, y: Math.random() * 120 });
-      timeout = setTimeout(move, 6000 + Math.random() * 2000);
+      setPos({ x: Math.random() * 120, y: Math.random() * 180 });
+      timeout = setTimeout(move, 3500 + Math.random() * 1200);
     }
     move();
     return () => clearTimeout(timeout);
@@ -93,12 +93,11 @@ function FloatingMudra() {
   return (
     <motion.div
       className="hidden md:block fixed z-10 opacity-20 blur-xs pointer-events-none select-none"
-      style={{ left: '2vw', top: '8vh', width: '5rem', height: '5rem' }}
-      animate={{ x: pos.x, y: pos.y }}
-      transition={{ x: { duration: 3 }, y: { duration: 3 } }}
+      style={{ left: '1vw', top: '6vh', width: '8rem', height: '8rem' }}
+      animate={{ x: pos.x, y: pos.y, rotate: [0, 12, -10, 0] }}
+      transition={{ x: { duration: 2.5 }, y: { duration: 2.5 }, rotate: { duration: 6, repeat: Infinity } }}
     >
-      {/* Placeholder Mudra SVG */}
-      <div className="w-full h-full bg-pink-300 rounded-full flex items-center justify-center text-2xl font-bold">🤲</div>
+      <div className="w-full h-full bg-pink-300 rounded-full flex items-center justify-center text-4xl font-bold">🤲</div>
     </motion.div>
   );
 }
@@ -109,8 +108,8 @@ function FloatingLotus() {
   useEffect(() => {
     let timeout;
     function move() {
-      setPos({ x: Math.random() * 60, y: Math.random() * 80 });
-      timeout = setTimeout(move, 7000 + Math.random() * 2000);
+      setPos({ x: Math.random() * 160, y: Math.random() * 120 });
+      timeout = setTimeout(move, 4000 + Math.random() * 1200);
     }
     move();
     return () => clearTimeout(timeout);
@@ -118,12 +117,11 @@ function FloatingLotus() {
   return (
     <motion.div
       className="hidden md:block fixed z-10 opacity-20 blur-xs pointer-events-none select-none"
-      style={{ right: '4vw', bottom: '8vh', width: '6rem', height: '6rem' }}
-      animate={{ x: pos.x, y: pos.y }}
-      transition={{ x: { duration: 3.5 }, y: { duration: 3.5 } }}
+      style={{ right: '2vw', bottom: '7vh', width: '9rem', height: '9rem' }}
+      animate={{ x: pos.x, y: pos.y, rotate: [0, -14, 10, 0] }}
+      transition={{ x: { duration: 2.8 }, y: { duration: 2.8 }, rotate: { duration: 7, repeat: Infinity } }}
     >
-      {/* Placeholder Lotus SVG */}
-      <div className="w-full h-full bg-purple-200 rounded-full flex items-center justify-center text-2xl font-bold">🌸</div>
+      <div className="w-full h-full bg-purple-200 rounded-full flex items-center justify-center text-5xl font-bold">🌸</div>
     </motion.div>
   );
 }
@@ -134,8 +132,8 @@ function FloatingLamp() {
   useEffect(() => {
     let timeout;
     function move() {
-      setPos({ x: Math.random() * 40, y: Math.random() * 100 });
-      timeout = setTimeout(move, 8000 + Math.random() * 2000);
+      setPos({ x: Math.random() * 120, y: Math.random() * 140 });
+      timeout = setTimeout(move, 4200 + Math.random() * 1200);
     }
     move();
     return () => clearTimeout(timeout);
@@ -143,12 +141,11 @@ function FloatingLamp() {
   return (
     <motion.div
       className="hidden md:block fixed z-10 opacity-20 blur-xs pointer-events-none select-none"
-      style={{ right: '6vw', top: '10vh', width: '4.5rem', height: '4.5rem' }}
-      animate={{ x: pos.x, y: pos.y }}
-      transition={{ x: { duration: 4 }, y: { duration: 4 } }}
+      style={{ right: '3vw', top: '8vh', width: '7.5rem', height: '7.5rem' }}
+      animate={{ x: pos.x, y: pos.y, rotate: [0, 10, -12, 0] }}
+      transition={{ x: { duration: 2.7 }, y: { duration: 2.7 }, rotate: { duration: 6.5, repeat: Infinity } }}
     >
-      {/* Placeholder Lamp SVG */}
-      <div className="w-full h-full bg-yellow-200 rounded-full flex items-center justify-center text-2xl font-bold">🪔</div>
+      <div className="w-full h-full bg-yellow-200 rounded-full flex items-center justify-center text-4xl font-bold">🪔</div>
     </motion.div>
   );
 }
@@ -198,19 +195,19 @@ function ThoranamGarland() {
   const beads = Array.from({ length: beadCount }).map((_, i) => {
     const x = 30 + i * ((1270 - 30) / (beadCount - 1));
     const y = getRopeY(x);
-    return <circle key={i} cx={x} cy={y} r="4" fill="#b91c1c" stroke="#fff" strokeWidth="1.5" />;
+    return <circle key={i} cx={x} cy={y} r="5.5" fill="#b91c1c" stroke="#fff" strokeWidth="1.5" />;
   });
   return (
     <motion.svg
-      className="fixed left-0 right-0 top-28 w-full h-28 md:h-36 z-10 opacity-20 blur-xs pointer-events-none select-none"
-      viewBox="0 0 1300 180"
+      className="fixed left-0 right-0 top-28 w-full h-36 md:h-48 z-10 opacity-20 blur-xs pointer-events-none select-none"
+      viewBox="0 0 1300 220"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       animate={{
-        y: [0, 6, 0, -4, 0],
-        rotate: [0, 1, -1, 0]
+        y: [0, 24, 0, -18, 0],
+        rotate: [0, 2, -2, 0]
       }}
-      transition={{ repeat: Infinity, duration: 13, ease: 'easeInOut' }}
+      transition={{ repeat: Infinity, duration: 10, ease: 'easeInOut' }}
       style={{ maxWidth: '100vw' }}
     >
       {/* Beaded salangai-like path */}
@@ -222,22 +219,22 @@ function ThoranamGarland() {
         return (
           <g key={i}>
             {/* Bell string */}
-            <rect x={x - 1} y={y} width="2" height="18" rx="1" fill="#b45309" />
+            <rect x={x - 1} y={y} width="2" height="22" rx="1" fill="#b45309" />
             {/* Bell */}
             <motion.circle
               cx={x}
-              cy={y + 18}
-              r="13"
+              cy={y + 22}
+              r="16"
               fill="#fbbf24"
               stroke="#b45309"
               strokeWidth="3"
               animate={{
-                y: [0, 4 * Math.sin((i / (bellCount - 1)) * Math.PI), 0, -2 * Math.cos((i / (bellCount - 1)) * Math.PI), 0]
+                y: [0, 8 * Math.sin((i / (bellCount - 1)) * Math.PI), 0, -4 * Math.cos((i / (bellCount - 1)) * Math.PI), 0]
               }}
-              transition={{ repeat: Infinity, duration: 8 + i, ease: 'easeInOut' }}
+              transition={{ repeat: Infinity, duration: 7 + i, ease: 'easeInOut' }}
             />
             {/* Bell highlight */}
-            <circle cx={x + 4} cy={y + 13 + 8} r="2" fill="#fff" />
+            <circle cx={x + 5} cy={y + 13 + 13} r="2.5" fill="#fff" />
           </g>
         );
       })}
