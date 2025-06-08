@@ -39,11 +39,9 @@ const InstructorDetail = () => {
             <h2 className="text-xl font-bold text-pink-700 mb-2">About Bhargavi</h2>
             <p>Bhargavi Venkataraman, an engineer by profession, began her nrithya journey as a third grader. She holds her Masters of Fine Arts in Bharatanatyam from SASTRA University, India, and is a Grade B Doordarshan artist. Bhargavi has performed at prestigious arangams, dance festivals, and sabhas across India, and was awarded Best Performer of 2016 by Sri Parthasarathy Swami Sabha. She was among the 1000 dancers at the 1000th year celebration of the Tanjore Brihadeeswarar Temple.</p>
             <p>Bhargavi melds taut Bharatanatyam stances with lissome eloquence, transforming herself into various personae and navarasas. She connects with audiences and students alike through heartfelt bhava, energetic nritta, and a focus on both tradition and innovation. Her classes nurture flexibility, fitness, and creative expression.</p>
+            <p>{instructor.detailedBio}</p>
           </div>
         )}
-        <div className="prose prose-pink max-w-none text-gray-800 text-lg mb-6 text-left w-full">
-          <ReactMarkdown>{instructor.detailedBio}</ReactMarkdown>
-        </div>
         {/* Notable Performances section, only for Bhargavi */}
         {instructor.id === 'bhargavi' && (
           <div className="prose prose-pink max-w-none text-gray-800 text-lg mb-6 text-left w-full bg-orange-50 rounded-2xl p-6 shadow-inner">
