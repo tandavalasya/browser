@@ -11,39 +11,41 @@ export const fetchPlaceReviews = async (placeId) => {
       throw new Error('Google Maps API not loaded');
     }
 
-    // Create a request object for the new Places API
-    const request = {
-      placeId: placeId,
-      fields: ['reviews', 'rating', 'name', 'formattedAddress']
-    };
-
-    // Use the Places Service to get details
-    const service = new google.maps.places.PlacesService(document.createElement('div'));
-    
-    return new Promise((resolve, reject) => {
-      service.getDetails(request, (place, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && place) {
-          if (!place.reviews || !place.reviews.length) {
-            console.log('No reviews found for place:', place);
-            resolve([]);
-            return;
-          }
-
-          // Transform the reviews to match our format
-          const reviews = place.reviews.map(review => ({
-            author: review.author_name,
-            rating: review.rating,
-            text: review.text,
-            time: review.time,
-            source: 'Google Business'
-          }));
-          resolve(reviews);
-        } else {
-          console.error('Places service error:', status);
-          reject(new Error(`Failed to fetch place details: ${status}`));
-        }
-      });
+    // Create a map instance (required for the new Places API)
+    const map = new google.maps.Map(document.createElement('div'), {
+      center: { lat: 0, lng: 0 },
+      zoom: 1
     });
+
+    // Create a Place instance using the new API
+    const place = new google.maps.places.Place({
+      id: placeId,
+      map: map
+    });
+
+    try {
+      // Fetch place details
+      const result = await place.fetchFields({
+        fields: ['reviews', 'rating', 'name', 'formattedAddress']
+      });
+
+      if (!result.reviews || !result.reviews.length) {
+        console.log('No reviews found for place:', result);
+        return [];
+      }
+
+      // Transform the reviews to match our format
+      return result.reviews.map(review => ({
+        author: review.authorName || review.author_name,
+        rating: review.rating,
+        text: review.text,
+        time: review.time || review.publishTime,
+        source: 'Google Business'
+      }));
+    } finally {
+      // Clean up the map instance
+      map.setMap(null);
+    }
   } catch (error) {
     console.error('Error fetching place reviews:', error);
     // Log more details about the error

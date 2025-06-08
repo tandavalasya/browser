@@ -27,9 +27,9 @@ export const loadGooglePlacesApi = async () => {
       };
 
       // Create and append the script with recommended loading pattern
-      // Using v=beta for the new Places API
+      // Include both maps and places libraries
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${config.apiKey}&libraries=places&callback=initGooglePlacesApi&loading=async&v=beta`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${config.apiKey}&libraries=maps,places&callback=initGooglePlacesApi&loading=async&v=beta`;
       script.async = true;
       script.defer = true;
       
