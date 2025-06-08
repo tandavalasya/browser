@@ -1,4 +1,4 @@
-import googlePlacesConfig from '../config/googlePlaces.json';
+// Google Places configuration now comes from environment variables
 
 // Utility to handle Google Places API loading
 let apiLoadPromise = null;
@@ -17,7 +17,7 @@ export const loadGooglePlacesApi = async () => {
   // Create new loading promise
   apiLoadPromise = new Promise((resolve, reject) => {
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${googlePlacesConfig.apiKey}&libraries=maps,places&callback=initGooglePlacesApi&loading=async`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_PLACES_API_KEY}&libraries=maps,places&callback=initGooglePlacesApi&loading=async`;
     script.async = true;
     script.defer = true;
 

@@ -1,5 +1,5 @@
 {
-  "placeId": "ChIJEVt4NMRzkFQRiQ2waSlam8o",
-  "apiKey": "AIzaSyDq2U_m1Pw8asLmg9LWaOYhE4ubDNzxrr0",
+  "placeId": "MOVED_TO_ENV_VARS",
+  "apiKey": "MOVED_TO_ENV_VARS",
   "fields": ["reviews", "rating"]
 }

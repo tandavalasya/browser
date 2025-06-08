@@ -94,10 +94,10 @@ export const APP_CONSTANTS = {
     }
   },
 
-  // Social media configuration
+  // Social media configuration - now environment configurable
   SOCIAL: {
-    INSTAGRAM: 'tandavalasya_',
-    YOUTUBE: '@tandavalasyadance'
+    INSTAGRAM: import.meta.env.VITE_INSTAGRAM_HANDLE,
+    YOUTUBE: import.meta.env.VITE_YOUTUBE_HANDLE
   }
 };
 

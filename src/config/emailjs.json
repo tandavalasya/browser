@@ -1,8 +1,8 @@
 {
-  "publicKey": "test-key",
-  "serviceId": "test-service",
-  "userTemplateId": "test-user-template",
-  "adminTemplateId": "test-admin-template",
+  "publicKey": "MOVED_TO_ENV_VARS",
+  "serviceId": "MOVED_TO_ENV_VARS", 
+  "userTemplateId": "MOVED_TO_ENV_VARS",
+  "adminTemplateId": "MOVED_TO_ENV_VARS",
   "allowedDomains": [
     "gmail.com",
     "yahoo.com",

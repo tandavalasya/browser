@@ -42,5 +42,11 @@ dist-ssr
 .env.production.local
 .env.production
 
+# Environment files - DO NOT COMMIT
+dev.env
+prod.env
+.env.dev
+.env.prod
+
 # Environment-specific configs
 src/config/*.env.json

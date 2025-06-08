@@ -1,5 +1,5 @@
 // Service to handle Google Places API interactions
-import googlePlacesConfig from '../config/googlePlaces.json';
+// Google Places configuration now comes from environment variables
 import { loadGooglePlacesApi } from '../utils/googlePlacesLoader';
 
 // Only use supported fields for the Place API
@@ -14,7 +14,8 @@ export const fetchGoogleReviews = async () => {
 
   try {
     // Validate fields before making the request
-    const unsupportedFields = googlePlacesConfig.fields.filter(
+    const configFields = ['reviews', 'rating']; // From original config
+    const unsupportedFields = configFields.filter(
       field => !SUPPORTED_FIELDS.includes(field)
     );
     
@@ -48,7 +49,7 @@ export const fetchGoogleReviews = async () => {
 
     // Create the request object with all fields we need
     const request = {
-      placeId: googlePlacesConfig.placeId,
+      placeId: import.meta.env.VITE_GOOGLE_PLACES_PLACE_ID,
       fields: SUPPORTED_FIELDS,
       // Get most recent reviews first
       reviews_sort: 'newest',

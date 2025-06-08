@@ -1,12 +1,12 @@
 [
   {
     "name": "Instagram",
-    "url": "https://instagram.com/tandavalasya_",
+    "url": "CONFIGURED_VIA_ENV_VARS",
     "icon": "📷"
   },
   {
     "name": "YouTube",
-    "url": "https://youtube.com/@tandavalasyadance",
+    "url": "CONFIGURED_VIA_ENV_VARS",
     "icon": "📺"
   }
 ] 

@@ -35,10 +35,10 @@ class EmailConfigManager {
     try {
       // Try to load production configuration from static import
       const config = {
-        publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'test-key',
-        serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID || 'test-service',
-        userTemplateId: import.meta.env.VITE_EMAILJS_USER_TEMPLATE || 'test-user-template',
-        adminTemplateId: import.meta.env.VITE_EMAILJS_ADMIN_TEMPLATE || 'test-admin-template',
+        publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+        serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        userTemplateId: import.meta.env.VITE_EMAILJS_USER_TEMPLATE,
+        adminTemplateId: import.meta.env.VITE_EMAILJS_ADMIN_TEMPLATE,
         allowedDomains: ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'example.com', 'localhost'],
         rateLimit: {
           maxRequests: 5,
@@ -46,11 +46,11 @@ class EmailConfigManager {
         }
       };
 
-      if (config.publicKey !== 'test-key') {
+      if (config.publicKey && config.publicKey !== 'missing-config') {
         logger.info('EmailJS configuration loaded from environment variables');
       } else {
-        logger.info('EmailJS running in development mode - contact form will simulate email sending', {
-          note: 'To enable email sending, configure environment variables as described in docs/ENVIRONMENT_SETUP.md'
+        logger.warn('EmailJS configuration missing - contact form will not send emails', {
+          note: 'Configure environment variables as described in docs/ENVIRONMENT_SETUP.md'
         });
       }
       
@@ -62,10 +62,10 @@ class EmailConfigManager {
       });
       
       return {
-        publicKey: 'test-key',
-        serviceId: 'test-service',
-        userTemplateId: 'test-user-template',
-        adminTemplateId: 'test-admin-template',
+        publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'missing-config',
+        serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID || 'missing-config',
+        userTemplateId: import.meta.env.VITE_EMAILJS_USER_TEMPLATE || 'missing-config',
+        adminTemplateId: import.meta.env.VITE_EMAILJS_ADMIN_TEMPLATE || 'missing-config',
         allowedDomains: ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'example.com', 'localhost'],
         rateLimit: {
           maxRequests: 5,

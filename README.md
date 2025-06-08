@@ -197,12 +197,22 @@ Include id, name, title, image, bio, detailed bio, specialties, and experience.
 ## ⚙️ Technical Management
 
 ### Environment Setup
-Create `.env.local` for EmailJS configuration:
-```env
-VITE_EMAILJS_SERVICE_ID=your_service_id
-VITE_EMAILJS_TEMPLATE_ID=your_template_id
-VITE_EMAILJS_PUBLIC_KEY=your_public_key
+**🔒 Security Note**: This repository is configured for public release. All sensitive data has been moved to environment variables.
+
+For local development, copy the template:
+```bash
+cp dev.env .env.local
 ```
+
+Then update `.env.local` with your actual EmailJS credentials:
+```env
+VITE_EMAILJS_PUBLIC_KEY=your_actual_public_key
+VITE_EMAILJS_SERVICE_ID=your_actual_service_id
+VITE_EMAILJS_USER_TEMPLATE=your_actual_user_template_id
+VITE_EMAILJS_ADMIN_TEMPLATE=your_actual_admin_template_id
+```
+
+**For production deployment**, see [`docs/SECURITY_DEPLOYMENT.md`](docs/SECURITY_DEPLOYMENT.md) for complete security and deployment instructions.
 
 ### Testing
 ```bash

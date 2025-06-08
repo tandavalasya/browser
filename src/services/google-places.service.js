@@ -10,7 +10,7 @@ import { BaseService } from '../core/services/base.service.js';
 import { logger } from '../core/utils/logger.util.js';
 import { errorHandler, NetworkError, ApiError } from '../core/utils/error-handler.util.js';
 import { APP_CONSTANTS } from '../core/constants/app.constants.js';
-import googlePlacesConfig from '../config/googlePlaces.json';
+// Google Places configuration now comes from environment variables
 
 /**
  * Google Places API Configuration
@@ -78,7 +78,7 @@ export class DefaultGooglePlacesApiLoader extends GooglePlacesApiLoader {
       // Load the script with API key from config
       const script = document.createElement('script');
       // Use imported config, fallback to environment variable
-      const apiKey = googlePlacesConfig.apiKey || 
+      const apiKey = import.meta.env.VITE_GOOGLE_PLACES_API_KEY || 
         (typeof process !== 'undefined' && process.env ? process.env.REACT_APP_GOOGLE_PLACES_API_KEY : null);
       
       if (!apiKey) {
@@ -359,17 +359,10 @@ export class GooglePlacesService extends BaseService {
    * @private
    */
   _loadConfig() {
-    // Use imported config, fallback to environment variables
-    if (googlePlacesConfig && googlePlacesConfig.placeId) {
-      return {
-        ...googlePlacesConfig,
-        fields: googlePlacesConfig.fields || GOOGLE_PLACES_CONFIG.SUPPORTED_FIELDS
-      };
-    }
-    
-    // Fallback to environment variables
+    // Load configuration from environment variables
     return {
-      placeId: typeof process !== 'undefined' && process.env ? process.env.REACT_APP_GOOGLE_PLACE_ID : null,
+      placeId: import.meta.env.VITE_GOOGLE_PLACES_PLACE_ID,
+      apiKey: import.meta.env.VITE_GOOGLE_PLACES_API_KEY,
       fields: GOOGLE_PLACES_CONFIG.SUPPORTED_FIELDS
     };
   }
