@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useGoogleSheetCSV } from '../utils/useGoogleSheetCSV';
-import config from '../config/tandavalasya.config.json';
+import classColors from '../config/classColors.json';
 
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRmYOSXn1a6VJb3VLG2hvYrnSAyZaLB8OyGOfcR4Cm-8HPwOGy8rQ-C_Rf1y4b4_LbCelC_MydXpYQx/pub?gid=0&single=true&output=csv';
 
@@ -10,7 +10,7 @@ function getCellClass(value) {
   if (!value) return 'bg-gray-100 text-gray-500';
   const normalizedValue = value.trim().toLowerCase();
   const colorMap = {};
-  Object.entries(config.classColors).forEach(([k, v]) => {
+  Object.entries(classColors).forEach(([k, v]) => {
     colorMap[k.trim().toLowerCase()] = v;
   });
   const colorClass = colorMap[normalizedValue];
@@ -81,7 +81,7 @@ const Schedule = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [scheduleData, setScheduleData] = useState({ headers, rows });
-  const [colorMap, setColorMap] = useState(config.classColors);
+  const [colorMap, setColorMap] = useState(classColors);
 
   useEffect(() => {
     const fetchSchedule = async () => {
@@ -172,7 +172,7 @@ const Schedule = () => {
       </motion.h2>
       {/* Legend */}
       <motion.div className="flex flex-wrap gap-4 mb-6 justify-center" variants={itemVariants}>
-        {Object.entries(config.classColors).map(([label, colorClass]) => (
+        {Object.entries(classColors).map(([label, colorClass]) => (
           <span key={label} className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold ${colorClass}`}>
             <span className="w-3 h-3 rounded-full inline-block" style={{ background: colorClass.split(' ')[0].replace('bg-', '').replace('-', '#') }}></span>
             {label}

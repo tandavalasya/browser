@@ -13,7 +13,7 @@ import BlogPost from './pages/BlogPost';
 import GalleryEventDetail from './pages/GalleryEventDetail';
 import InstructorDetail from './pages/InstructorDetail';
 import './App.css'
-import config from './config/tandavalasya.config.json';
+import socials from './config/socials.json';
 
 const navLinks = [
   { to: '/', label: 'Home' },
@@ -250,8 +250,8 @@ function Footer() {
       <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="font-bold text-lg tracking-wide">TandavaLasya &copy; {new Date().getFullYear()}</div>
         <div className="flex gap-4 text-pink-600 text-xl">
-          <a href={`https://instagram.com/${config.socials.instagram}`} className="hover:text-pink-800" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i className="fab fa-instagram"></i> Instagram</a>
-          <a href={`https://youtube.com/${config.socials.youtube}`} className="hover:text-red-800" aria-label="YouTube" target="_blank" rel="noopener noreferrer"><i className="fab fa-youtube"></i> YouTube</a>
+          <a href={`https://instagram.com/${socials.instagram}`} className="hover:text-pink-800" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i className="fab fa-instagram"></i> Instagram</a>
+          <a href={`https://youtube.com/${socials.youtube}`} className="hover:text-red-800" aria-label="YouTube" target="_blank" rel="noopener noreferrer"><i className="fab fa-youtube"></i> YouTube</a>
         </div>
       </div>
     </footer>

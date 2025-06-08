@@ -1,0 +1,7 @@
+{
+  "Intermediate Kids": "bg-orange-200 text-orange-800",
+  "Beginner Adult": "bg-blue-200 text-blue-800",
+  "Advanced Adult": "bg-green-200 text-green-800",
+  "Beginner Kids": "bg-pink-200 text-pink-800",
+  "Reserved for Private Classes": "bg-gray-200 text-gray-700"
+} 

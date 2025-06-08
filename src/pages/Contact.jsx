@@ -2,7 +2,8 @@ import React, { Fragment, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import emailjs from 'emailjs-com';
-import config from '../config/tandavalasya.config.json';
+import locations from '../config/locations.json';
+import socials from '../config/socials.json';
 import emailjsConfig from '../config/emailjs.json';
 
 // Initialize EmailJS with the public key
@@ -174,7 +175,7 @@ const Contact = () => {
             className="px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400"
           >
             <option value="">Select...</option>
-            {config.locations.map(loc => (
+            {locations.map(loc => (
               <option key={loc} value={loc}>{loc}</option>
             ))}
           </select>
@@ -210,8 +211,8 @@ const Contact = () => {
       <motion.div className="mt-8 flex flex-col items-center gap-2" variants={itemVariants}>
         <span className="text-gray-600">Or reach out on:</span>
         <div className="flex gap-4 mt-2">
-          <a href={`https://instagram.com/${config.socials.instagram}`} className="text-pink-600 hover:text-pink-800 font-bold" target="_blank" rel="noopener noreferrer">Instagram</a>
-          <a href={`https://youtube.com/${config.socials.youtube}`} className="text-red-600 hover:text-red-800 font-bold" target="_blank" rel="noopener noreferrer">YouTube</a>
+          <a href={`https://instagram.com/${socials.instagram}`} className="text-pink-600 hover:text-pink-800 font-bold" target="_blank" rel="noopener noreferrer">Instagram</a>
+          <a href={`https://youtube.com/${socials.youtube}`} className="text-red-600 hover:text-red-800 font-bold" target="_blank" rel="noopener noreferrer">YouTube</a>
         </div>
       </motion.div>
       <motion.div className="mt-8 bg-blue-100 rounded-lg h-40 flex items-center justify-center text-blue-400" variants={itemVariants}>[Map Placeholder]</motion.div>
