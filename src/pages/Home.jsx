@@ -43,35 +43,52 @@ const Home = () => {
   const controls = useAnimation();
 
   useEffect(() => {
+    let isMounted = true;
+
     const loadReviews = async () => {
       try {
         setIsLoading(true);
         setError(null);
         
-        // Load both types of reviews and config in parallel
+        // First load the site reviews and config
         const [siteMod, config] = await Promise.all([
           import('../config/reviews.json'),
           import('../config/googlePlaces.json')
         ]);
 
+        if (!isMounted) return;
+
         setSiteReviews(siteMod.default || siteMod);
         setPlaceConfig(config.default);
 
-        // Fetch Google reviews using the new service
-        const googleReviewsData = await fetchPlaceReviews(config.default.placeId);
-        setGoogleReviews(googleReviewsData);
+        // Then try to load Google reviews
+        try {
+          const googleReviewsData = await fetchPlaceReviews(config.default.placeId);
+          if (isMounted) {
+            setGoogleReviews(googleReviewsData);
+          }
+        } catch (googleError) {
+          console.error('Error loading Google reviews:', googleError);
+          // Don't set error state for Google reviews failure
+          // Just log it and continue with site reviews
+        }
       } catch (err) {
         console.error('Error loading reviews:', err);
-        setError('Unable to load reviews. Please try again later.');
-        // Still load site reviews even if Google reviews fail
-        const siteMod = await import('../config/reviews.json');
-        setSiteReviews(siteMod.default || siteMod);
+        if (isMounted) {
+          setError('Unable to load reviews. Please try again later.');
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     loadReviews();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Combine both types of reviews

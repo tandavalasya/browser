@@ -1,6 +1,11 @@
 // Service to handle Google Places API interactions
+import { loadGooglePlacesApi } from '../utils/googlePlacesLoader';
+
 export const fetchPlaceReviews = async (placeId) => {
   try {
+    // Ensure API is loaded before proceeding
+    await loadGooglePlacesApi();
+
     const { google } = window;
     if (!google || !google.maps || !google.maps.places) {
       throw new Error('Google Maps API not loaded');
