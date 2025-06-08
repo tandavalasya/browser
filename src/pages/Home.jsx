@@ -33,63 +33,180 @@ const staggeredItem = {
   show: { opacity: 1, x: 0, transition: { type: 'spring', stiffness: 60 } },
 };
 
-const ReviewTile = ({ review, placeId }) => {
-  const isGoogleReview = review.source === 'google';
-  const authorName = isGoogleReview ? review.author : review.authorName;
-  const reviewText = isGoogleReview ? review.text : review.reviewText;
-  const reviewDate = isGoogleReview ? new Date(review.date) : new Date(review.reviewDate);
-  const profilePhoto = isGoogleReview ? review.profilePhoto : review.profilePhotoUrl;
-  const rating = review.rating || 5;
-
-  if (!authorName || !reviewText) {
+const ReviewTile = ({ review }) => {
+  if (!review) {
+    console.error('ReviewTile received null or undefined review');
     return null;
   }
 
+  const {
+    author = 'Anonymous',
+    rating = 5,
+    text = '',
+    date = new Date().toISOString(),
+    profilePhoto = null,
+    source = 'site'
+  } = review;
+
+  // Format the date
+  const formattedDate = new Date(date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
   return (
-    <div
-      className={`bg-white rounded-2xl shadow-xl p-6 flex flex-col w-[300px] flex-shrink-0 relative hover:scale-105 transition-transform duration-300 ${
-        isGoogleReview ? 'border-2 border-blue-100' : ''
-      }`}
-    >
-      <div className="flex items-center gap-4 mb-4">
-        <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center border-2 border-pink-200 shadow">
-          <span className="text-pink-500 text-lg font-semibold">
-            {authorName.charAt(0).toUpperCase()}
-          </span>
-        </div>
-        <div className="flex-1">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-pink-700 text-base">{authorName}</h3>
-            {isGoogleReview && placeId && (
-              <a 
-                href={`https://www.google.com/maps/place/?q=place_id:${placeId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-500 hover:text-blue-600 transition-colors"
-                title="View on Google"
-              >
-                <FaGoogle size={14} />
-              </a>
-            )}
+    <div className="bg-white rounded-lg shadow-lg p-6 h-full flex flex-col">
+      <div className="flex items-center mb-4">
+        {profilePhoto ? (
+          <img
+            src={profilePhoto}
+            alt={author}
+            className="w-12 h-12 rounded-full mr-4"
+            onError={(e) => {
+              console.error('Error loading profile photo:', e);
+              e.target.src = '/default-avatar.png';
+            }}
+          />
+        ) : (
+          <div className="w-12 h-12 rounded-full bg-gray-200 mr-4 flex items-center justify-center">
+            <span className="text-gray-500 text-lg">
+              {author.charAt(0).toUpperCase()}
+            </span>
           </div>
-          <div className="flex items-center gap-1 mt-1">
-            {[...Array(5)].map((_, i) => (
-              <span key={i} className={`text-lg ${i < rating ? 'text-yellow-400' : 'text-gray-300'}`}>
-                ★
-              </span>
-            ))}
+        )}
+        <div>
+          <h3 className="font-semibold text-gray-900">{author}</h3>
+          <div className="flex items-center">
+            <div className="flex text-yellow-400">
+              {[...Array(5)].map((_, i) => (
+                <svg
+                  key={i}
+                  className={`w-4 h-4 ${
+                    i < rating ? 'text-yellow-400' : 'text-gray-300'
+                  }`}
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              ))}
+            </div>
+            <span className="ml-2 text-sm text-gray-600">{formattedDate}</span>
           </div>
         </div>
       </div>
-      <p className="text-gray-700 text-base leading-relaxed mb-4 flex-1">
-        {reviewText}
-      </p>
-      <div className="text-sm text-gray-400 mt-auto">
-        {reviewDate.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        })}
+      <p className="text-gray-700 flex-grow">{text}</p>
+      {source === 'google' && (
+        <div className="mt-4 flex items-center text-sm text-gray-500">
+          <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zm0 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2zm0 3a7 7 0 100 14 7 7 0 000-14zm0 2a5 5 0 110 10 5 5 0 010-10z" />
+          </svg>
+          Google Review
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ReviewsSection = ({ reviews }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const containerRef = useRef(null);
+  
+  // Calculate reviews per page based on screen width
+  const getReviewsPerPage = () => {
+    if (window.innerWidth < 640) return 1;
+    if (window.innerWidth < 1024) return 2;
+    return 3;
+  };
+
+  const [reviewsPerPage, setReviewsPerPage] = useState(getReviewsPerPage());
+  const totalPages = Math.ceil(reviews.length / reviewsPerPage);
+
+  // Update reviews per page on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setReviewsPerPage(getReviewsPerPage());
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const handlePrevious = () => {
+    setCurrentIndex((prev) => (prev - 1 + totalPages) % totalPages);
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % totalPages);
+  };
+
+  const handleDotClick = (index) => {
+    setCurrentIndex(index);
+  };
+
+  if (!reviews || reviews.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-600">No reviews available</p>
+      </div>
+    );
+  }
+
+  // Calculate the current set of reviews to display
+  const startIndex = currentIndex * reviewsPerPage;
+  const visibleReviews = reviews.slice(startIndex, startIndex + reviewsPerPage);
+
+  return (
+    <div className="relative max-w-7xl mx-auto px-4">
+      {/* Reviews Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {visibleReviews.map((review) => (
+          <ReviewTile key={review.id} review={review} />
+        ))}
+      </div>
+
+      {/* Navigation Controls */}
+      <div className="flex justify-center items-center mt-8 gap-4">
+        <button
+          onClick={handlePrevious}
+          disabled={currentIndex === 0}
+          className={`p-2 rounded-full bg-white shadow-lg transition-colors ${
+            currentIndex === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'
+          }`}
+          aria-label="Previous review"
+        >
+          <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        
+        {/* Pagination Dots */}
+        <div className="flex gap-2">
+          {[...Array(totalPages)].map((_, index) => (
+            <button
+              key={index}
+              onClick={() => handleDotClick(index)}
+              className={`w-2 h-2 rounded-full transition-colors ${
+                currentIndex === index ? 'bg-blue-600' : 'bg-gray-300'
+              }`}
+              aria-label={`Go to review page ${index + 1}`}
+            />
+          ))}
+        </div>
+
+        <button
+          onClick={handleNext}
+          disabled={currentIndex === totalPages - 1}
+          className={`p-2 rounded-full bg-white shadow-lg transition-colors ${
+            currentIndex === totalPages - 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'
+          }`}
+          aria-label="Next review"
+        >
+          <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
       </div>
     </div>
   );
@@ -211,29 +328,43 @@ const Home = () => {
 
   // Transform and combine reviews
   const transformReviews = useCallback((siteReviews, googleReviews) => {
-    // Transform site reviews
-    const transformedSiteReviews = siteReviews.map(review => ({
-      ...review,
-      id: `site-${review.id}`,
-      source: 'site',
-      date: review.date || new Date().toISOString()
-    }));
+    try {
+      // Transform site reviews with proper field mapping
+      const transformedSiteReviews = (siteReviews || []).map(review => ({
+        id: `site-${review.id}`,
+        source: 'site',
+        author: review.authorName || 'Student',
+        rating: review.rating || 5,
+        text: review.reviewText || '',
+        date: review.reviewDate || new Date().toISOString(),
+        profilePhoto: null
+      }));
 
-    // Transform Google reviews and ensure uniqueness
-    const transformedGoogleReviews = (googleReviews?.reviews || []).map(review => ({
-      ...review,
-      id: review.id || `google-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      source: 'google'
-    }));
+      // Transform Google reviews
+      const transformedGoogleReviews = (googleReviews?.reviews || []).map(review => ({
+        id: review.id,
+        source: 'google',
+        author: review.author || 'Google User',
+        rating: review.rating || 5,
+        text: review.text || '',
+        date: review.date || new Date().toISOString(),
+        profilePhoto: review.profilePhoto || null
+      }));
 
-    // Combine and deduplicate reviews
-    const allReviews = [...transformedSiteReviews, ...transformedGoogleReviews];
-    const uniqueReviews = Array.from(
-      new Map(allReviews.map(review => [review.id, review])).values()
-    );
+      // Combine all reviews
+      const allReviews = [...transformedSiteReviews, ...transformedGoogleReviews];
 
-    // Sort by date, most recent first
-    return uniqueReviews.sort((a, b) => new Date(b.date) - new Date(a.date));
+      // Remove duplicates using a Map (keeping the first occurrence)
+      const uniqueReviews = Array.from(
+        new Map(allReviews.map(review => [review.id, review])).values()
+      );
+
+      // Sort by date, most recent first
+      return uniqueReviews.sort((a, b) => new Date(b.date) - new Date(a.date));
+    } catch (error) {
+      console.error('Error transforming reviews:', error);
+      return [];
+    }
   }, []);
 
   useEffect(() => {
@@ -243,47 +374,33 @@ const Home = () => {
         setError(null);
 
         // Fetch Google reviews
-        let transformedGoogleReviews = [];
-        try {
-          const googleReviewsData = await fetchGoogleReviews();
-          if (googleReviewsData && googleReviewsData.reviews) {
-            transformedGoogleReviews = googleReviewsData.reviews.map(review => ({
-              ...review,
-              id: `google-${review.date}`,
-              source: 'google'
-            }));
-          }
-        } catch (googleError) {
-          console.error('Failed to load Google reviews:', googleError);
-          setError(`Failed to load Google reviews: ${googleError.message}`);
-          // Continue with site reviews even if Google reviews fail
-        }
+        const googleReviewsData = await fetchGoogleReviews();
+        
+        // Transform and combine all reviews
+        const combinedReviews = transformReviews(siteReviews, googleReviewsData);
+        
+        // Update state with combined reviews
+        setAllReviews(combinedReviews);
+        
+        // Log review counts for debugging
+        console.error('Review counts:', {
+          total: combinedReviews.length,
+          site: siteReviews.length,
+          google: googleReviewsData?.reviews?.length || 0
+        });
 
-        // Combine and sort reviews
-        const combined = [...siteReviews, ...transformedGoogleReviews]
-          .sort((a, b) => new Date(b.date || b.reviewDate) - new Date(a.date || a.reviewDate));
-
-        setAllReviews(combined);
-      } catch (err) {
-        console.error('Error in fetchReviews:', err);
-        setError(err.message || 'Failed to load reviews');
+      } catch (error) {
+        console.error('Error fetching reviews:', error);
+        setError('Failed to load reviews. Please try again later.');
+        // Fallback to site reviews only
+        setAllReviews(transformReviews(siteReviews, null));
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchReviews();
-  }, []);
-
-  // Temporary logging to debug combined reviews
-  useEffect(() => {
-    console.log('Combined Reviews:', {
-      totalReviews: allReviews.length,
-      siteReviews: siteReviews.length,
-      googleReviews: googleReviews.length,
-      sampleReviews: allReviews.slice(0, 2)
-    });
-  }, [allReviews, siteReviews, googleReviews]);
+  }, [siteReviews, transformReviews]);
 
   useEffect(() => {
     if (allReviews.length > 0 && !isLoading && !isManualNavigation.current) {
@@ -393,55 +510,7 @@ const Home = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
             </div>
           ) : (
-            <div className="relative max-w-7xl mx-auto">
-              <div className="reviews-carousel overflow-hidden">
-                <div
-                  ref={carouselRef}
-                  className="flex gap-4 transition-transform duration-500 ease-in-out"
-                  style={{ willChange: 'transform' }}
-                >
-                  {allReviews.map((review) => (
-                    <ReviewTile 
-                      key={review.id} 
-                      review={review} 
-                      placeId={placeConfig?.placeId}
-                    />
-                  ))}
-                </div>
-              </div>
-              <div className="flex flex-col items-center gap-4 mt-8">
-                <div className="flex justify-center gap-4">
-                  <button
-                    onClick={handlePrevious}
-                    className="p-2 rounded-full bg-pink-100 text-pink-600 hover:bg-pink-200 transition-colors"
-                    aria-label="Previous review"
-                  >
-                    <FaChevronLeft size={20} />
-                  </button>
-                  <button
-                    onClick={handleNext}
-                    className="p-2 rounded-full bg-pink-100 text-pink-600 hover:bg-pink-200 transition-colors"
-                    aria-label="Next review"
-                  >
-                    <FaChevronRight size={20} />
-                  </button>
-                </div>
-                {allReviews.length > 0 && (
-                  <div className="flex justify-center gap-2 mt-4">
-                    {allReviews.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleDotClick(index)}
-                        className={`w-2 h-2 rounded-full transition-colors ${
-                          index === currentIndex ? 'bg-pink-500' : 'bg-gray-300'
-                        }`}
-                        aria-label={`Go to review ${index + 1}`}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+            <ReviewsSection reviews={allReviews} />
           )}
         </ErrorBoundary>
       </div>

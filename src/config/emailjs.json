@@ -1,0 +1,14 @@
+{
+  "serviceId": "service_gotwzgl",
+  "userTemplateId": "template_8thsq14",
+  "adminTemplateId": "template_gqkxbke",
+  "publicKey": "MwEHCJXodYceC0-ol",
+  "allowedDomains": ["localhost", "tandavalasya.com"],
+  "templateParams": {
+    "from_name": "",
+    "from_email": "",
+    "message": "",
+    "location": "",
+    "submitted_at": ""
+  }
+} 

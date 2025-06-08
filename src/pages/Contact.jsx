@@ -3,10 +3,10 @@ import { motion } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import emailjs from 'emailjs-com';
 import config from '../config/tandavalasya.config.json';
+import emailjsConfig from '../config/emailjs.json';
 
-const SERVICE_ID = 'your_service_id'; // TODO: Replace with your EmailJS service ID
-const TEMPLATE_ID = 'your_template_id'; // TODO: Replace with your EmailJS template ID
-const USER_ID = 'your_user_id'; // TODO: Replace with your EmailJS user ID
+// Initialize EmailJS with the public key
+emailjs.init(emailjsConfig.publicKey);
 
 const containerVariants = {
   hidden: {},
@@ -32,6 +32,7 @@ const Contact = () => {
   const [form, setForm] = useState({ name: '', email: '', message: '', location: '' });
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
+  const [domainError, setDomainError] = useState('');
 
   // Pre-fill message if present
   useEffect(() => {
@@ -40,29 +41,64 @@ const Contact = () => {
     }
   }, [prefillMessage]);
 
+  const validateDomain = (email) => {
+    const domain = email.split('@')[1];
+    return emailjsConfig.allowedDomains.some(allowedDomain => 
+      domain === allowedDomain || 
+      (allowedDomain === 'localhost' && window.location.hostname === 'localhost')
+    );
+  };
+
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+    
+    // Clear domain error when email changes
+    if (name === 'email' && domainError) {
+      setDomainError('');
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setStatus('');
+    setDomainError('');
+
+    // Validate domain
+    if (!validateDomain(form.email)) {
+      setDomainError('Please use an email from an allowed domain');
+      setLoading(false);
+      return;
+    }
+
+    const templateParams = {
+      from_name: form.name,
+      from_email: form.email,
+      message: form.message,
+      location: form.location,
+      submitted_at: new Date().toLocaleString()
+    };
+
     try {
+      // Send acknowledgment to user
       await emailjs.send(
-        SERVICE_ID,
-        TEMPLATE_ID,
-        {
-          from_name: form.name,
-          from_email: form.email,
-          message: form.message,
-          location: form.location,
-        },
-        USER_ID
+        emailjsConfig.serviceId,
+        emailjsConfig.userTemplateId, // Template for user acknowledgment
+        templateParams
       );
+
+      // Send notification to admin (BCC)
+      await emailjs.send(
+        emailjsConfig.serviceId,
+        emailjsConfig.adminTemplateId, // Template for admin notification
+        templateParams
+      );
+
       setStatus('success');
       setForm({ name: '', email: '', message: '', location: '' });
     } catch (err) {
+      console.error('Error sending email:', err);
       setStatus('error');
     } finally {
       setLoading(false);
@@ -87,12 +123,56 @@ const Contact = () => {
         className="rounded-xl p-8 flex flex-col gap-4"
         variants={itemVariants}
       >
-        <motion.input name="name" type="text" placeholder="Your Name" value={form.name} onChange={handleChange} className="px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400" required variants={itemVariants} />
-        <motion.input name="email" type="email" placeholder="Your Email" value={form.email} onChange={handleChange} className="px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400" required variants={itemVariants} />
-        <motion.textarea name="message" placeholder="Your Message" rows={4} value={form.message} onChange={handleChange} className="px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400" required variants={itemVariants} />
+        <motion.input 
+          name="name" 
+          type="text" 
+          placeholder="Your Name" 
+          value={form.name} 
+          onChange={handleChange} 
+          className="px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400" 
+          required 
+          variants={itemVariants} 
+        />
+        <div className="flex flex-col gap-1">
+          <motion.input 
+            name="email" 
+            type="email" 
+            placeholder="Your Email" 
+            value={form.email} 
+            onChange={handleChange} 
+            className={`px-4 py-2 rounded border ${domainError ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-pink-400`}
+            required 
+            variants={itemVariants} 
+          />
+          {domainError && (
+            <motion.span 
+              className="text-red-500 text-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              {domainError}
+            </motion.span>
+          )}
+        </div>
+        <motion.textarea 
+          name="message" 
+          placeholder="Your Message" 
+          rows={4} 
+          value={form.message} 
+          onChange={handleChange} 
+          className="px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400" 
+          required 
+          variants={itemVariants} 
+        />
         <div className="flex flex-col gap-2">
           <label className="font-semibold text-gray-700">Location <span className="text-pink-500">*</span></label>
-          <select name="location" value={form.location} onChange={handleChange} required className="px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400">
+          <select 
+            name="location" 
+            value={form.location} 
+            onChange={handleChange} 
+            required 
+            className="px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400"
+          >
             <option value="">Select...</option>
             {config.locations.map(loc => (
               <option key={loc} value={loc}>{loc}</option>
@@ -101,15 +181,31 @@ const Contact = () => {
         </div>
         <motion.button
           type="submit"
-          className="px-6 py-2 bg-pink-500 text-white rounded-full font-semibold hover:bg-pink-600 transition-colors"
-          disabled={loading}
+          className="px-6 py-2 bg-pink-500 text-white rounded-full font-semibold hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={loading || !!domainError}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
           {loading ? 'Sending...' : 'Send Message'}
         </motion.button>
-        {status === 'success' && <motion.div className="text-green-600 mt-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>Message sent successfully!</motion.div>}
-        {status === 'error' && <motion.div className="text-red-600 mt-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>Failed to send message. Please try again.</motion.div>}
+        {status === 'success' && (
+          <motion.div 
+            className="text-green-600 mt-2" 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }}
+          >
+            Message sent successfully!
+          </motion.div>
+        )}
+        {status === 'error' && (
+          <motion.div 
+            className="text-red-600 mt-2" 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }}
+          >
+            Failed to send message. Please try again.
+          </motion.div>
+        )}
       </motion.form>
       <motion.div className="mt-8 flex flex-col items-center gap-2" variants={itemVariants}>
         <span className="text-gray-600">Or reach out on:</span>
