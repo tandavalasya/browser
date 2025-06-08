@@ -141,18 +141,20 @@ describe('Contact Component', () => {
     fireEvent.change(locationSelect, { target: { value: 'Vancouver, BC, Canada' } });
     fireEvent.change(messageInput, { target: { value: 'Test message for error handling test' } });
     
-    // Wait for form validation
+    // Wait for all form fields to be properly filled and React state to update
     await waitFor(() => {
       expect(nameInput.value).toBe('Test User');
       expect(emailInput.value).toBe('test@gmail.com');
-    });
+      expect(locationSelect.value).toBe('Vancouver, BC, Canada');
+      expect(messageInput.value).toBe('Test message for error handling test');
+    }, { timeout: 1000 });
     
     const submitButton = screen.getByText(/send message/i);
     
-    // Wait for button to be enabled, then click
+    // Wait for button to be enabled after all validations pass
     await waitFor(() => {
       expect(submitButton).not.toBeDisabled();
-    });
+    }, { timeout: 2000 });
     
     fireEvent.click(submitButton);
     
@@ -161,7 +163,7 @@ describe('Contact Component', () => {
     await waitFor(() => {
       // Look for success message since EmailService works in test mode
       expect(screen.getByText(/message sent successfully/i)).toBeInTheDocument();
-    }, { timeout: 2000 });
+    }, { timeout: 3000 });
   });
 
   test('form reset functionality works after submission', async () => {

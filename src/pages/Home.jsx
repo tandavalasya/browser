@@ -68,6 +68,22 @@ function HeroSection() {
     <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
       <div className="max-w-4xl mx-auto text-center">
         <AnimationWrapper variant="fadeIn">
+          <motion.div
+            className="mb-8"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6 }}
+          >
+            <img
+              src="/logo.png"
+              alt="TandavaLasya - Classical Bharatanatyam Dance School"
+              className="mx-auto h-32 md:h-40 w-auto object-contain"
+              onError={(e) => {
+                logger.warn('Logo failed to load', { src: e.target.src });
+                e.target.style.display = 'none';
+              }}
+            />
+          </motion.div>
           <motion.h1 
             className="text-4xl md:text-6xl font-bold text-gray-900 mb-6"
             initial={{ opacity: 0, y: 50 }}
@@ -534,19 +550,19 @@ function ClassesHighlight() {
       title: 'Beginner Classes',
       description: 'Perfect for those new to Bharatanatyam. Learn basic positions, movements, and cultural context.',
       image: '/images/beginner-class.jpg',
-      link: '/schedule#beginner'
+      link: '/classes/beginner'
     },
     {
       title: 'Intermediate Training',
       description: 'Advance your skills with complex choreography and deeper understanding of the art form.',
       image: '/images/intermediate-class.jpg',
-      link: '/schedule#intermediate'
+      link: '/classes/intermediate'
     },
     {
       title: 'Performance Preparation',
       description: 'Intensive training for students preparing for performances and competitive showcases.',
       image: '/images/performance-class.jpg',
-      link: '/schedule#performance'
+      link: '/classes/performance'
     }
   ];
 

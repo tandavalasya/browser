@@ -40,6 +40,9 @@ import Contact from './pages/Contact.jsx';
 import BlogPost from './pages/BlogPost.jsx';
 import GalleryEventDetail from './pages/GalleryEventDetail.jsx';
 import InstructorDetail from './pages/InstructorDetail.jsx';
+import BeginnerClasses from './pages/BeginnerClasses.jsx';
+import IntermediateTraining from './pages/IntermediateTraining.jsx';
+import PerformancePreparation from './pages/PerformancePreparation.jsx';
 
 // Configuration and constants
 import { ROUTE_CONSTANTS, NAVIGATION_CONSTANTS } from './core/constants/app.constants.js';
@@ -106,6 +109,24 @@ const ROUTE_CONFIG = [
     element: InstructorDetail,
     key: 'instructor',
     name: 'Instructor Detail'
+  },
+  {
+    path: '/classes/beginner',
+    element: BeginnerClasses,
+    key: 'beginner-classes',
+    name: 'Beginner Classes'
+  },
+  {
+    path: '/classes/intermediate',
+    element: IntermediateTraining,
+    key: 'intermediate-training',
+    name: 'Intermediate Training'
+  },
+  {
+    path: '/classes/performance',
+    element: PerformancePreparation,
+    key: 'performance-preparation',
+    name: 'Performance Preparation'
   }
 ];
 
