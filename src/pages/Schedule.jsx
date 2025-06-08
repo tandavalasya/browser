@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useGoogleSheetCSV } from '../utils/useGoogleSheetCSV';
@@ -63,27 +63,69 @@ function calculateRowSpansHour(rows, headers) {
   return rowSpans;
 }
 
+const getColorClass = (value, colorMap) => {
+  if (!value || !colorMap || Object.keys(colorMap).length === 0) {
+    return 'bg-gray-100';
+  }
+
+  const normalizedValue = value.toLowerCase().trim();
+  const colorClass = colorMap[normalizedValue];
+  return colorClass || 'bg-gray-100';
+};
+
 const Schedule = () => {
   const { data, loading, error } = useGoogleSheetCSV(CSV_URL);
   const headers = data && data.length > 0 ? Object.keys(data[0]) : [];
   const rows = data;
   const rowSpans = calculateRowSpansHour(rows, headers);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [scheduleData, setScheduleData] = useState({ headers, rows });
+  const [colorMap, setColorMap] = useState(config.classColors);
 
-  // Debug: print headers and first 5 rows
-  React.useEffect(() => {
-    if (headers.length && rows.length) {
-      console.log('HEADERS:', headers);
-      console.log('FIRST 5 ROWS:', rows.slice(0, 5));
-    }
-  }, [headers, rows]);
+  useEffect(() => {
+    const fetchSchedule = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-  // Debug: log the entire data array
-  React.useEffect(() => {
-    if (rows && rows.length) {
-      console.log('Raw schedule data:', rows);
-    }
-  }, [rows]);
+        const response = await fetch(googlePlacesConfig.scheduleUrl);
+        if (!response.ok) {
+          throw new Error('Failed to fetch schedule data');
+        }
+
+        const data = await response.text();
+        const { headers, rows } = parseCSV(data);
+
+        if (!headers.length || !rows.length) {
+          throw new Error('Invalid schedule data format');
+        }
+
+        setScheduleData({ headers, rows });
+      } catch (err) {
+        setError('Unable to load schedule. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSchedule();
+  }, []);
+
+  const renderCell = (value, header, i, j) => {
+    const span = value === scheduleData.rows[i - 1]?.[j] ? 0 : 1;
+    const colorClass = getColorClass(value, colorMap);
+
+    return (
+      <td
+        key={`${i}-${j}`}
+        className={`p-2 border ${colorClass} ${span === 0 ? 'hidden' : ''}`}
+        rowSpan={span || undefined}
+      >
+        {value}
+      </td>
+    );
+  };
 
   // Find the header for the time slot column (case-insensitive)
   const timeHeader = headers.find(h => h.toLowerCase().includes('time')) || headers[1];
