@@ -38,7 +38,7 @@ export const loadGooglePlacesApi = () => {
     } else {
       // Create and append the script
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_GOOGLE_PLACES_API_KEY}&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_PLACES_API_KEY || 'AIzaSyDq2U_m1Pw8asLmg9LWaOYhE4ubDNzxrr0'}&libraries=places`;
       script.async = true;
       script.defer = true;
       
