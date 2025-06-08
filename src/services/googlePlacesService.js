@@ -11,11 +11,17 @@ export const fetchPlaceReviews = async (placeId) => {
       throw new Error('Google Maps API not loaded');
     }
 
-    // Use the new Places API format
+    // Create a Place instance using the new API format
+    // The new API requires a different constructor format
     const place = new google.maps.places.Place({
       id: placeId,
       // The new API uses a different format for fields
-      fields: ['reviews', 'rating', 'name', 'formattedAddress']
+      fields: {
+        reviews: true,
+        rating: true,
+        name: true,
+        formattedAddress: true
+      }
     });
 
     // Fetch place details using the new API format
