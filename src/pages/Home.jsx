@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { FaChevronLeft, FaChevronRight, FaGoogle } from 'react-icons/fa';
-import fetchGoogleReviews from '../services/googlePlaces';
+import { fetchPlaceReviews } from '../services/googlePlacesService';
 
 const containerVariants = {
   hidden: {},
@@ -49,15 +49,17 @@ const Home = () => {
         setError(null);
         
         // Load both types of reviews and config in parallel
-        const [siteMod, googleReviewsData, config] = await Promise.all([
+        const [siteMod, config] = await Promise.all([
           import('../config/reviews.json'),
-          fetchGoogleReviews(),
           import('../config/googlePlaces.json')
         ]);
 
         setSiteReviews(siteMod.default || siteMod);
-        setGoogleReviews(googleReviewsData);
         setPlaceConfig(config.default);
+
+        // Fetch Google reviews using the new service
+        const googleReviewsData = await fetchPlaceReviews(config.default.placeId);
+        setGoogleReviews(googleReviewsData);
       } catch (err) {
         console.error('Error loading reviews:', err);
         setError('Unable to load reviews. Please try again later.');
