@@ -3,7 +3,6 @@ import { motion, useAnimation } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { FaChevronLeft, FaChevronRight, FaGoogle } from 'react-icons/fa';
 import fetchGoogleReviews from '../services/googlePlaces';
-import { GOOGLE_PLACES_CONFIG } from '../config/googlePlaces';
 
 const containerVariants = {
   hidden: {},
@@ -39,6 +38,7 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [placeConfig, setPlaceConfig] = useState(null);
   const carouselRef = useRef(null);
   const controls = useAnimation();
 
@@ -48,14 +48,16 @@ const Home = () => {
         setIsLoading(true);
         setError(null);
         
-        // Load both types of reviews in parallel
-        const [siteMod, googleReviewsData] = await Promise.all([
+        // Load both types of reviews and config in parallel
+        const [siteMod, googleReviewsData, config] = await Promise.all([
           import('../config/reviews.json'),
-          fetchGoogleReviews()
+          fetchGoogleReviews(),
+          import('../config/googlePlaces.json')
         ]);
 
         setSiteReviews(siteMod.default || siteMod);
         setGoogleReviews(googleReviewsData);
+        setPlaceConfig(config.default);
       } catch (err) {
         console.error('Error loading reviews:', err);
         setError('Unable to load reviews. Please try again later.');
@@ -183,9 +185,9 @@ const Home = () => {
                   {review.image && <img src={review.image} alt={review.name} className="w-14 h-14 rounded-full object-cover mb-2 border-2 border-pink-200 shadow" />}
                   <div className="font-semibold text-pink-700 mb-1 text-base flex items-center gap-2">
                     {review.name}
-                    {review.source === 'google' && (
+                    {review.source === 'google' && placeConfig && (
                       <a 
-                        href={`https://www.google.com/maps/place/?q=place_id:${GOOGLE_PLACES_CONFIG.PLACE_ID}`}
+                        href={`https://www.google.com/maps/place/?q=place_id:${placeConfig.placeId}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-500 hover:text-blue-600 transition-colors"
