@@ -72,7 +72,6 @@ const Home = () => {
           className="w-28 h-28 rounded-full bg-gradient-to-tr from-white via-pink-50 to-orange-100 flex items-center justify-center mb-4 shadow-xl border-2 border-pink-200 z-10"
           animate={{ scale: [1, 1.08, 1] }}
           transition={{ repeat: Infinity, duration: 2 }}
-          variants={itemVariants}
         >
           <img src="/logo.png" alt="TandavaLasya Logo" className="w-20 h-20 object-cover drop-shadow-md" />
         </motion.div>
