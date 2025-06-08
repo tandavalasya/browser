@@ -1,10 +1,5 @@
 {
   "placeId": "ChIJEVt4NMRzkFQRiQ2waSlam8o",
-  "fields": {
-    "reviews": true,
-    "rating": true,
-    "name": true,
-    "formattedAddress": true
-  },
+  "fields": ["reviews", "rating", "name", "formattedAddress"],
   "apiKey": "AIzaSyDq2U_m1Pw8asLmg9LWaOYhE4ubDNzxrr0"
 } 
