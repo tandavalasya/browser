@@ -11,7 +11,9 @@ import Schedule from './pages/Schedule';
 import Contact from './pages/Contact';
 import BlogPost from './pages/BlogPost';
 import GalleryEventDetail from './pages/GalleryEventDetail';
+import InstructorDetail from './pages/InstructorDetail';
 import './App.css'
+import config from './config/tandavalasya.config.json';
 
 const navLinks = [
   { to: '/', label: 'Home' },
@@ -35,6 +37,7 @@ function AnimatedRoutes() {
         <Route path="/blog/:slug" element={<motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.4 }}><BlogPost /></motion.div>} />
         <Route path="/schedule" element={<motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.4 }}><Schedule /></motion.div>} />
         <Route path="/contact" element={<motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.4 }}><Contact /></motion.div>} />
+        <Route path="/instructor/:id" element={<motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.4 }}><InstructorDetail /></motion.div>} />
       </Routes>
     </AnimatePresence>
   );
@@ -247,9 +250,8 @@ function Footer() {
       <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="font-bold text-lg tracking-wide">TandavaLasya &copy; {new Date().getFullYear()}</div>
         <div className="flex gap-4 text-pink-600 text-xl">
-          <a href="#" className="hover:text-pink-800" aria-label="Instagram"><i className="fab fa-instagram"></i> Instagram</a>
-          <a href="#" className="hover:text-blue-800" aria-label="Facebook"><i className="fab fa-facebook"></i> Facebook</a>
-          <a href="#" className="hover:text-red-800" aria-label="YouTube"><i className="fab fa-youtube"></i> YouTube</a>
+          <a href={`https://instagram.com/${config.socials.instagram}`} className="hover:text-pink-800" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i className="fab fa-instagram"></i> Instagram</a>
+          <a href={`https://youtube.com/${config.socials.youtube}`} className="hover:text-red-800" aria-label="YouTube" target="_blank" rel="noopener noreferrer"><i className="fab fa-youtube"></i> YouTube</a>
         </div>
       </div>
     </footer>
@@ -265,10 +267,10 @@ function App() {
         <div className="relative z-20">
           {/* Navbar */}
           <nav className="fixed top-0 left-0 w-full flex items-center justify-between px-6 py-4 bg-white/70 backdrop-blur-md border-b border-pink-200 shadow-lg rounded-b-2xl z-50">
-            <div className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-3">
               <img src="/logo.png" alt="TandavaLasya Logo" className="w-10 h-10 rounded-full object-contain bg-white shadow-lg" />
               <span className="font-extrabold text-lg tracking-wide">TandavaLasya</span>
-            </div>
+            </Link>
             {/* Desktop Nav */}
             <div className="hidden md:flex gap-6 font-medium text-base">
               {navLinks.map(link => (

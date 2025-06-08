@@ -1,0 +1,26 @@
+[
+  {
+    "id": "bhargavi",
+    "name": "Bhargavi Venkataraman",
+    "title": "Founder & Artistic Director",
+    "image": "/logo.png",
+    "shortBio": "MFA (Bharatanatyam), Grade B Doordarshan Artist. Award-winning performer and teacher.",
+    "detailedBio": "# Bhargavi Venkataraman\n\nBhargavi Venkataraman, an engineer by profession, began her nrithya journey as a third grader. ... (full markdown bio as above) ..."
+  },
+  {
+    "id": "teacher1",
+    "name": "Aparna Iyer",
+    "title": "Senior Instructor",
+    "image": "/teacher1.png",
+    "shortBio": "Aparna is a passionate Bharatanatyam teacher with 10+ years of experience.",
+    "detailedBio": "# Aparna Iyer\n\nAparna has been teaching and performing Bharatanatyam for over a decade. ... (placeholder bio) ..."
+  },
+  {
+    "id": "teacher2",
+    "name": "Ravi Kumar",
+    "title": "Instructor",
+    "image": "/teacher2.png",
+    "shortBio": "Ravi brings energy and creativity to every class.",
+    "detailedBio": "# Ravi Kumar\n\nRavi specializes in teaching young children and beginners. ... (placeholder bio) ..."
+  }
+] 

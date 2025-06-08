@@ -2,7 +2,7 @@ import React, { Fragment, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import emailjs from 'emailjs-com';
-import config from '../../../config/tandavalasya.config.json';
+import config from '../config/tandavalasya.config.json';
 
 const SERVICE_ID = 'your_service_id'; // TODO: Replace with your EmailJS service ID
 const TEMPLATE_ID = 'your_template_id'; // TODO: Replace with your EmailJS template ID
@@ -114,9 +114,9 @@ const Contact = () => {
       <motion.div className="mt-8 flex flex-col items-center gap-2" variants={itemVariants}>
         <span className="text-gray-600">Or reach out on:</span>
         <div className="flex gap-4 mt-2">
-          <a href="#" className="text-pink-600 hover:text-pink-800 font-bold">Instagram</a>
+          <a href={`https://instagram.com/${config.socials.instagram}`} className="text-pink-600 hover:text-pink-800 font-bold" target="_blank" rel="noopener noreferrer">Instagram</a>
           <a href="#" className="text-blue-600 hover:text-blue-800 font-bold">Facebook</a>
-          <a href="#" className="text-red-600 hover:text-red-800 font-bold">YouTube</a>
+          <a href={`https://youtube.com/${config.socials.youtube}`} className="text-red-600 hover:text-red-800 font-bold" target="_blank" rel="noopener noreferrer">YouTube</a>
         </div>
       </motion.div>
       <motion.div className="mt-8 bg-blue-100 rounded-lg h-40 flex items-center justify-center text-blue-400" variants={itemVariants}>[Map Placeholder]</motion.div>

@@ -1,0 +1,23 @@
+[
+  {
+    "id": "review1",
+    "name": "Priya S.",
+    "image": "/student1.png",
+    "rating": 5,
+    "review": "TandavaLasya has transformed my daughter's confidence and grace. Highly recommended!"
+  },
+  {
+    "id": "review2",
+    "name": "Anil K.",
+    "image": "",
+    "rating": 5,
+    "review": "The teachers are patient and inspiring. My son loves every class!"
+  },
+  {
+    "id": "review3",
+    "name": "Meera R.",
+    "image": "/student3.png",
+    "rating": 4,
+    "review": "A wonderful school with a warm, welcoming environment."
+  }
+] 
