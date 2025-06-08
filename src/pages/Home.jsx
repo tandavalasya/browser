@@ -57,53 +57,50 @@ const Home = () => {
   const next = () => setCurrentIndex((prev) => (prev === reviews.length - 1 ? 0 : prev + 1));
 
   return (
-    <div className="relative flex flex-col items-center justify-center w-full pb-20">
+    <div className="relative flex flex-col w-full pb-20">
       {/* Subtle floating background shapes, not covering floating elements */}
       <div className="absolute -top-24 -left-24 w-80 h-80 bg-pink-100 rounded-full blur-2xl opacity-20 z-0 pointer-events-none" />
       <div className="absolute -bottom-24 right-0 w-80 h-80 bg-orange-100 rounded-full blur-2xl opacity-20 z-0 pointer-events-none" />
       {/* Hero Section */}
-      <motion.div
-        className="flex flex-col items-center justify-center pt-24 pb-8 w-full z-10"
-        initial="hidden"
-        animate="show"
-        variants={containerVariants}
-      >
+      <div className="w-full max-w-3xl mx-auto flex flex-col md:flex-row items-center md:items-start gap-6 pt-8 pb-8 z-10">
         <motion.div
-          className="w-28 h-28 rounded-full bg-gradient-to-tr from-white via-pink-50 to-orange-100 flex items-center justify-center mb-4 shadow-xl border-2 border-pink-200 z-10"
+          className="w-28 h-28 aspect-square flex-shrink-0 rounded-full bg-gradient-to-tr from-white via-pink-50 to-orange-100 flex items-center justify-center shadow-xl border-2 border-pink-200 z-10 mx-auto md:mx-0"
           animate={{ scale: [1, 1.08, 1] }}
           transition={{ repeat: Infinity, duration: 2 }}
         >
-          <img src="/logo.png" alt="TandavaLasya Logo" className="w-20 h-20 object-cover drop-shadow-md" />
+          <img src="/logo.png" alt="TandavaLasya Logo" className="w-20 h-20 aspect-square rounded-full object-cover drop-shadow-md" />
         </motion.div>
-        <motion.h1 className="text-3xl md:text-5xl font-extrabold mb-2 tracking-tight drop-shadow-lg z-10 text-pink-700" variants={itemVariants}>
-          TandavaLasya
-        </motion.h1>
-        <motion.h2 className="text-lg md:text-2xl font-semibold mb-4 text-orange-600 z-10" variants={itemVariants}>
-          Bharatanatyam Dance School
-        </motion.h2>
-        <motion.p className="max-w-2xl text-base md:text-lg mb-6 text-gray-700 z-10" variants={itemVariants}>
-          Welcome to TandavaLasya, where tradition meets innovation. Led by <span className="font-bold text-pink-600">Bhargavi Venkataraman</span>, MFA (Bharatanatyam), Grade B Doordarshan artist, and award-winning performer, our school inspires students of all ages to discover the joy and discipline of Bharatanatyam.
-        </motion.p>
-        {/* CTA Buttons */}
-        <motion.div className="flex flex-row gap-4 justify-center z-10 mt-2 mb-2" variants={itemVariants}>
-          <Link to="/about" className="inline-block px-6 py-3 bg-gradient-to-r from-pink-500 to-orange-400 text-white font-bold rounded-full shadow-lg hover:from-orange-400 hover:to-pink-500 transition-transform duration-300 text-base">Meet Our Instructors</Link>
-          <Link to="/gallery" className="inline-block px-6 py-3 bg-white/80 text-pink-600 font-bold rounded-full shadow hover:bg-pink-50 transition-colors duration-300 text-base">Explore Gallery</Link>
-        </motion.div>
-      </motion.div>
+        <div className="flex flex-col justify-center w-full">
+          <motion.h1 className="text-3xl md:text-5xl font-extrabold mb-2 tracking-tight drop-shadow-lg z-10 text-pink-700 text-center md:text-left" variants={itemVariants}>
+            TandavaLasya
+          </motion.h1>
+          <motion.h2 className="text-lg md:text-2xl font-semibold mb-4 text-orange-600 z-10 text-center md:text-left" variants={itemVariants}>
+            Bharatanatyam Dance School
+          </motion.h2>
+          <motion.p className="max-w-2xl text-base md:text-lg mb-6 text-gray-700 z-10 text-center md:text-left mx-auto md:mx-0" variants={itemVariants}>
+            Welcome to TandavaLasya, where tradition meets innovation. Led by <span className="font-bold text-pink-600">Bhargavi Venkataraman</span>, MFA (Bharatanatyam), Grade B Doordarshan artist, and award-winning performer, our school inspires students of all ages to discover the joy and discipline of Bharatanatyam.
+          </motion.p>
+          {/* CTA Buttons */}
+          <motion.div className="flex flex-row gap-4 z-10 mt-2 mb-2 justify-center md:justify-start" variants={itemVariants}>
+            <Link to="/about" className="inline-block px-6 py-3 bg-gradient-to-r from-pink-500 to-orange-400 text-white font-bold rounded-full shadow-lg hover:from-orange-400 hover:to-pink-500 transition-transform duration-300 text-base">Meet Our Instructors</Link>
+            <Link to="/gallery" className="inline-block px-6 py-3 bg-white/80 text-pink-600 font-bold rounded-full shadow hover:bg-pink-50 transition-colors duration-300 text-base">Explore Gallery</Link>
+          </motion.div>
+        </div>
+      </div>
       {/* About Bhargavi / School Philosophy */}
-      <motion.div className="w-full max-w-3xl mx-auto flex flex-col items-center mb-10 z-10" initial="hidden" whileInView="show" viewport={{ once: true }} variants={containerVariants}>
-        <motion.h3 className="text-xl md:text-2xl font-bold text-pink-700 mb-2" variants={itemVariants}>Our Mission & Vision</motion.h3>
-        <motion.p className="text-base md:text-lg text-gray-700 mb-4 text-center" variants={itemVariants}>
+      <motion.div className="w-full max-w-3xl mx-auto flex flex-col mb-10 z-10" initial="hidden" whileInView="show" viewport={{ once: true }} variants={containerVariants}>
+        <motion.h3 className="text-xl md:text-2xl font-bold text-pink-700 mb-2 text-left" variants={itemVariants}>Our Mission & Vision</motion.h3>
+        <motion.p className="text-base md:text-lg text-gray-700 mb-4 text-left" variants={itemVariants}>
           At TandavaLasya, our mission is to nurture a lifelong love for Bharatanatyam by blending tradition with creativity, discipline with joy, and art with holistic well-being. We believe that dance is not just a performance, but a journey of self-discovery, health, and community.
         </motion.p>
-        <motion.p className="text-base md:text-lg text-gray-700 mb-4 text-center" variants={itemVariants}>
+        <motion.p className="text-base md:text-lg text-gray-700 mb-4 text-left" variants={itemVariants}>
           Our vision is to create a vibrant, inclusive space where students of all ages and backgrounds can experience the transformative power of Bharatanatyam. We are committed to fostering not only artistic excellence, but also physical fitness, mental resilience, and a deep sense of belonging.
         </motion.p>
       </motion.div>
       {/* Why Choose Us - no box, just staggered points */}
-      <motion.div className="w-full max-w-3xl mx-auto flex flex-col items-center mb-10 z-10">
-        <motion.div className="text-orange-600 font-bold text-lg mb-2">Why Choose Us?</motion.div>
-        <motion.ul className="w-full flex flex-col gap-2" variants={staggeredList} initial="hidden" whileInView="show" viewport={{ once: true }}>
+      <motion.div className="w-full max-w-3xl mx-auto flex flex-col mb-10 z-10">
+        <motion.div className="text-orange-600 font-bold text-lg mb-2 text-left">Why Choose Us?</motion.div>
+        <motion.ul className="w-full flex flex-col gap-2 text-left" variants={staggeredList} initial="hidden" whileInView="show" viewport={{ once: true }}>
           {[
             'Rooted in the rich tradition of Bharatanatyam, with a modern, creative approach',
             'Holistic focus: dance technique, health, fitness, and flexibility',
@@ -121,9 +118,9 @@ const Home = () => {
         </motion.ul>
       </motion.div>
       {/* School Tenets & Philosophy */}
-      <motion.div className="w-full max-w-3xl mx-auto flex flex-col items-center mb-10 z-10" initial="hidden" whileInView="show" viewport={{ once: true }} variants={containerVariants}>
-        <motion.h3 className="text-xl md:text-2xl font-bold text-orange-700 mb-2" variants={itemVariants}>Our Tenets</motion.h3>
-        <motion.ul className="text-base md:text-lg text-gray-700 mb-2 text-center list-disc list-inside" variants={itemVariants}>
+      <motion.div className="w-full max-w-3xl mx-auto flex flex-col mb-10 z-10" initial="hidden" whileInView="show" viewport={{ once: true }} variants={containerVariants}>
+        <motion.h3 className="text-xl md:text-2xl font-bold text-orange-700 mb-2 text-left" variants={itemVariants}>Our Tenets</motion.h3>
+        <motion.ul className="text-base md:text-lg text-gray-700 mb-2 text-left list-disc list-inside" variants={itemVariants}>
           <li>Respect for the ancient art of Bharatanatyam, honoring its history and spiritual roots</li>
           <li>Encouraging curiosity, creativity, and innovation in every student</li>
           <li>Promoting physical health through structured warm-ups, mindful stretching, and safe technique</li>
@@ -134,7 +131,7 @@ const Home = () => {
       </motion.div>
       {/* Reviews Carousel - floating above a soft background */}
       <motion.div className="w-full max-w-4xl mx-auto mt-8 mb-16 relative z-20 overflow-x-hidden">
-        <h3 className="text-lg md:text-xl font-bold text-orange-600 mb-4 text-center">What Our Students Say</h3>
+        <h3 className="text-lg md:text-xl font-bold text-orange-600 mb-4 text-left">What Our Students Say</h3>
         {/* Carousel Arrows */}
         {reviews.length > 1 && (
           <>
@@ -184,9 +181,9 @@ const Home = () => {
         )}
       </motion.div>
       {/* Call to Action */}
-      <motion.div className="w-full max-w-3xl mx-auto flex flex-col items-center mb-8 z-10" initial="hidden" whileInView="show" viewport={{ once: true }} variants={containerVariants}>
-        <motion.h3 className="text-lg md:text-xl font-bold text-pink-700 mb-2" variants={itemVariants}>Join Us</motion.h3>
-        <motion.p className="text-base md:text-lg text-gray-700 mb-4 text-center" variants={itemVariants}>
+      <motion.div className="w-full max-w-3xl mx-auto flex flex-col mb-8 z-10" initial="hidden" whileInView="show" viewport={{ once: true }} variants={containerVariants}>
+        <motion.h3 className="text-lg md:text-xl font-bold text-pink-700 mb-2 text-left" variants={itemVariants}>Join Us</motion.h3>
+        <motion.p className="text-base md:text-lg text-gray-700 mb-4 text-left" variants={itemVariants}>
           Whether you are a beginner or an experienced dancer, TandavaLasya welcomes you to join our vibrant community. Experience the grace, tradition, and joy of Bharatanatyam in a supportive and inspiring environment.
         </motion.p>
         <Link to="/contact" className="inline-block px-6 py-3 bg-gradient-to-r from-pink-500 to-orange-400 text-white font-bold rounded-full shadow-lg hover:from-orange-400 hover:to-pink-500 transition-transform duration-300 text-base">Get Started</Link>

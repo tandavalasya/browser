@@ -24,15 +24,15 @@ const InstructorDetail = () => {
 
   return (
     <motion.section
-      className="min-h-screen flex flex-col items-center justify-center py-16 px-4"
+      className="min-h-screen flex flex-col justify-center py-16 px-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.7 }}
     >
-      <motion.div className="p-10 max-w-4xl w-full flex flex-col items-center relative" initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7 }}>
+      <motion.div className="p-10 max-w-4xl w-full flex flex-col items-start relative" initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7 }}>
         <img src={instructor.image} alt={instructor.name} className="w-40 h-40 md:w-52 md:h-52 rounded-full object-cover border-4 border-pink-200 shadow mb-4" />
-        <h1 className="text-3xl font-extrabold text-pink-700 mb-1 text-center">{instructor.name}</h1>
-        <div className="text-pink-500 text-lg mb-4 text-center">{instructor.title}</div>
+        <h1 className="text-3xl font-extrabold text-pink-700 mb-1 text-left">{instructor.name}</h1>
+        <div className="text-pink-500 text-lg mb-4 text-left">{instructor.title}</div>
         {/* About Bhargavi section, only for Bhargavi */}
         {instructor.id === 'bhargavi' && (
           <div className="prose prose-pink max-w-none text-gray-800 text-lg mb-6 text-left w-full bg-pink-50 rounded-2xl p-6 shadow-inner">
