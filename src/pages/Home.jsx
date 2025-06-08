@@ -129,7 +129,6 @@ const Home = () => {
       </motion.div>
       {/* Reviews Carousel - floating above a soft background */}
       <motion.div className="w-full max-w-4xl mx-auto mt-8 mb-16 relative z-20 overflow-x-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-pink-50 to-white rounded-3xl blur-md opacity-60 -z-10 max-w-4xl w-full mx-auto" />
         <h3 className="text-lg md:text-xl font-bold text-orange-600 mb-4 text-center">What Our Students Say</h3>
         <motion.div
           ref={carouselRef}
