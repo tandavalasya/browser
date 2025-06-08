@@ -1,13 +1,17 @@
-import { GOOGLE_PLACES_CONFIG } from '../config/googlePlaces';
-
 // Utility to handle Google Places API loading
 let isApiLoading = false;
 let apiLoadPromise = null;
 
-export const loadGooglePlacesApi = () => {
+// API key with fallback
+const API_KEY = import.meta.env.VITE_GOOGLE_PLACES_API_KEY || 'AIzaSyDq2U_m1Pw8asLmg9LWaOYhE4ubDNzxrr0';
+
+export const loadGooglePlacesApi = async () => {
+  // Load the config
+  const config = await import('../config/googlePlaces.json').then(module => module.default);
+
   // If API is already loaded, return resolved promise
   if (window.google && window.google.maps && window.google.maps.places) {
-    return Promise.resolve();
+    return Promise.resolve(config);
   }
 
   // If API is currently loading, return the existing promise
@@ -27,7 +31,7 @@ export const loadGooglePlacesApi = () => {
         if (window.google && window.google.maps && window.google.maps.places) {
           clearInterval(checkApiLoaded);
           isApiLoading = false;
-          resolve();
+          resolve(config);
         }
       }, 100);
 
@@ -40,13 +44,13 @@ export const loadGooglePlacesApi = () => {
     } else {
       // Create and append the script
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_PLACES_CONFIG.API_KEY}&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=places`;
       script.async = true;
       script.defer = true;
       
       script.onload = () => {
         isApiLoading = false;
-        resolve();
+        resolve(config);
       };
       
       script.onerror = () => {

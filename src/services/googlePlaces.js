@@ -1,18 +1,17 @@
 // Google Places API service for fetching reviews
-import { GOOGLE_PLACES_CONFIG } from '../config/googlePlaces';
 import { loadGooglePlacesApi } from '../utils/googlePlacesLoader';
 
 const fetchGoogleReviews = async () => {
   try {
-    // Ensure the API is loaded before proceeding
-    await loadGooglePlacesApi();
+    // Load the API and get the config
+    const config = await loadGooglePlacesApi();
 
     return new Promise((resolve, reject) => {
       const service = new window.google.maps.places.PlacesService(document.createElement('div'));
       
       const request = {
-        placeId: GOOGLE_PLACES_CONFIG.PLACE_ID,
-        fields: GOOGLE_PLACES_CONFIG.FIELDS
+        placeId: config.placeId,
+        fields: config.fields
       };
 
       service.getDetails(request, (place, status) => {
