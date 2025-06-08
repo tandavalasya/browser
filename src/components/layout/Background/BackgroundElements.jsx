@@ -241,7 +241,7 @@ const BackgroundElements = () => {
           }
         }}
       >
-        <span className="w-full h-full flex items-center justify-center text-7xl">🤲</span>
+        <span className="w-full h-full flex items-center justify-center text-7xl">🙏</span>
       </FloatingElement>
 
       {/* Floating Lamp - Bottom Right */}
