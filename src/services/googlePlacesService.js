@@ -3,7 +3,7 @@ import { loadGooglePlacesApi } from '../utils/googlePlacesLoader';
 import googlePlacesConfig from '../config/googlePlaces.json';
 
 // Supported fields for Places API
-const SUPPORTED_FIELDS = ['reviews', 'rating', 'address'];
+const SUPPORTED_FIELDS = ['reviews', 'rating'];
 
 export async function fetchPlaceReviews() {
   let map = null;
@@ -47,8 +47,7 @@ export async function fetchPlaceReviews() {
       console.log('No reviews found for place:', result);
       return {
         reviews: [],
-        rating: result.rating || 0,
-        address: result.address || ''
+        rating: result.rating || 0
       };
     }
 
@@ -63,8 +62,7 @@ export async function fetchPlaceReviews() {
 
     return {
       reviews,
-      rating: result.rating || 0,
-      address: result.address || ''
+      rating: result.rating || 0
     };
 
   } catch (error) {

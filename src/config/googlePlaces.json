@@ -1,5 +1,5 @@
 {
   "placeId": "ChIJN1t_tDeuEmsRUsoyG83frY4",
   "apiKey": "AIzaSyDJC5a7TFJYOYKk-xtJqh7xCykWW6b7DmY",
-  "fields": ["reviews", "rating", "address"]
+  "fields": ["reviews", "rating"]
 } 
