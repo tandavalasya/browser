@@ -24,7 +24,7 @@ const InstructorDetail = () => {
 
   return (
     <motion.section
-      className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-pink-50 via-orange-50 to-white py-16 px-4"
+      className="min-h-screen flex flex-col items-center justify-center py-16 px-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.7 }}
