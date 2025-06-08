@@ -1,25 +1,29 @@
 // Service to handle Google Places API interactions
-import { loadGooglePlacesApi } from '../utils/googlePlacesLoader';
+import { loadGooglePlacesAPI } from '../utils/googlePlacesLoader';
+import googlePlacesConfig from '../config/googlePlaces.json';
 
-export const fetchPlaceReviews = async (placeId) => {
-  let mapDiv = null;
+// Supported fields for Places API
+const SUPPORTED_FIELDS = ['reviews', 'rating', 'formatted_address'];
+
+export async function fetchPlaceReviews() {
   let map = null;
+  let mapDiv = null;
 
   try {
-    // Ensure API is loaded before proceeding
-    await loadGooglePlacesApi();
-
-    const { google } = window;
-    if (!google || !google.maps || !google.maps.places) {
-      throw new Error('Google Maps API not loaded');
+    // Validate fields before making the request
+    const invalidFields = googlePlacesConfig.fields.filter(field => !SUPPORTED_FIELDS.includes(field));
+    if (invalidFields.length > 0) {
+      throw new Error(`Unsupported fields requested: ${invalidFields.join(', ')}`);
     }
 
-    // Create a temporary div for the map
+    await loadGooglePlacesAPI();
+    
+    // Create a hidden div for the map
     mapDiv = document.createElement('div');
     mapDiv.style.display = 'none';
     document.body.appendChild(mapDiv);
 
-    // Create a map instance (required for the new Places API)
+    // Create map instance
     map = new google.maps.Map(mapDiv, {
       center: { lat: 0, lng: 0 },
       zoom: 1,
@@ -28,46 +32,48 @@ export const fetchPlaceReviews = async (placeId) => {
       keyboardShortcuts: false
     });
 
-    // Create a Place instance using the new API
-    const place = new google.maps.places.Place({
-      id: placeId,
-      map: map
+    // Create Places Service
+    const service = new google.maps.places.PlacesService(map);
+
+    // Create request object
+    const request = {
+      placeId: googlePlacesConfig.placeId,
+      fields: googlePlacesConfig.fields
+    };
+
+    return new Promise((resolve, reject) => {
+      service.getDetails(request, (place, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK && place) {
+          // Transform reviews to match our format
+          const reviews = (place.reviews || []).map(review => ({
+            author: review.author_name,
+            rating: review.rating,
+            text: review.text,
+            time: review.time,
+            source: 'Google'
+          }));
+
+          resolve({
+            reviews,
+            rating: place.rating,
+            address: place.formatted_address
+          });
+        } else {
+          reject(new Error(`Places service error: ${status}`));
+        }
+      });
     });
-
-    // Fetch place details
-    const result = await place.fetchFields({
-      fields: ['reviews', 'rating', 'name', 'formattedAddress']
-    });
-
-    if (!result.reviews || !result.reviews.length) {
-      console.log('No reviews found for place:', result);
-      return [];
-    }
-
-    // Transform the reviews to match our format
-    return result.reviews.map(review => ({
-      author: review.authorName || review.author_name,
-      rating: review.rating,
-      text: review.text,
-      time: review.time || review.publishTime,
-      source: 'Google Business'
-    }));
   } catch (error) {
     console.error('Error fetching place reviews:', error);
-    // Log more details about the error
-    if (error.message) {
-      console.error('Error details:', error.message);
-    }
-    if (error.stack) {
-      console.error('Error stack:', error.stack);
-    }
-    throw error;
+    console.error('Error details:', error.message);
+    console.error('Error stack:', error.stack);
+    throw new Error(`Error loading Google reviews: ${error.message}`);
   } finally {
-    // Clean up the map and div
+    // Clean up map resources
     if (mapDiv && mapDiv.parentNode) {
       mapDiv.parentNode.removeChild(mapDiv);
     }
     map = null;
     mapDiv = null;
   }
-}; 
+} 
