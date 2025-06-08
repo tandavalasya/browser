@@ -27,7 +27,35 @@ This document outlines the security measures implemented to prepare the TandavaL
   - `VITE_NODE_ENV` - Environment mode (development/production)
   - `VITE_LOG_LEVEL` - Logging level configuration
 
-### 2. **Git Ignore Configuration**
+### 2. **EmailJS Domain Security** 🔒
+
+#### **Domain Restriction Setup Required:**
+To prevent unauthorized use of your EmailJS service:
+
+1. **Go to [EmailJS Dashboard](https://dashboard.emailjs.com/) → Integration**
+2. **Remove wildcard `*` from Allowed Origins**
+3. **Add only your authorized domains:**
+   ```
+   # Production
+   https://your-domain.com
+   https://www.your-domain.com
+   
+   # Netlify (if using)
+   https://your-site.netlify.app
+   
+   # Development
+   http://localhost:5173
+   http://localhost:5174
+   ```
+
+#### **Security Benefits:**
+- ✅ Prevents unauthorized websites from using your EmailJS quota
+- ✅ Protects against spam and abuse
+- ✅ Ensures emails only come from your legitimate domains
+
+**📖 For detailed EmailJS security setup, see [`docs/EMAILJS_SECURITY.md`](EMAILJS_SECURITY.md)**
+
+### 3. **Git Ignore Configuration**
 
 Updated `.gitignore` to prevent sensitive files from being committed:
 ```
@@ -38,7 +66,7 @@ prod.env
 .env.prod
 ```
 
-### 3. **Code Security Improvements**
+### 4. **Code Security Improvements**
 
 #### **Constants File Updated:**
 `src/core/constants/app.constants.js` now uses environment variables:
@@ -75,7 +103,12 @@ The EmailJS service already uses environment variables with secure fallbacks:
    VITE_LOG_LEVEL=error
    ```
 
-3. **Optional Analytics Variables:**
+3. **Configure EmailJS Domain Restrictions:**
+   - Add your production domain to EmailJS allowed origins
+   - Remove wildcard `*` for security
+   - Test contact form after deployment
+
+4. **Optional Analytics Variables:**
    ```
    VITE_GA_TRACKING_ID=G-XXXXXXXXXX
    VITE_HOTJAR_ID=your_hotjar_site_id
@@ -136,15 +169,23 @@ The EmailJS service already uses environment variables with secure fallbacks:
 - [x] Constants updated to use environment variables
 - [x] No hardcoded credentials in source code
 
+### **EmailJS Security:**
+- [ ] **Domain restrictions configured** in EmailJS dashboard
+- [ ] **Wildcard `*` removed** from allowed origins
+- [ ] **Production domain added** to allowed origins
+- [ ] **Contact form tested** from production domain
+
 ### **Documentation:**
 - [x] Security audit documented
 - [x] Deployment instructions provided
 - [x] Environment setup guide available (`docs/ENVIRONMENT_SETUP.md`)
+- [x] EmailJS security guide created (`docs/EMAILJS_SECURITY.md`)
 - [x] README updated with deployment checklist
 
 ### **Testing:**
 - [ ] Test with production environment variables
 - [ ] Verify email functionality works with real EmailJS credentials
+- [ ] **Confirm EmailJS domain restrictions work properly**
 - [ ] Confirm all features work without sensitive data exposed
 - [ ] Test deployment on staging environment
 
@@ -165,7 +206,12 @@ The EmailJS service already uses environment variables with secure fallbacks:
    # Should output: dev.env prod.env
    ```
 
-3. **Review commit history:**
+3. **Configure EmailJS domain restrictions:**
+   - Remove wildcard `*` from EmailJS dashboard
+   - Add only your authorized domains
+   - Test contact form functionality
+
+4. **Review commit history:**
    ```bash
    git log --oneline -10
    # Ensure no commits contain sensitive data
@@ -174,20 +220,23 @@ The EmailJS service already uses environment variables with secure fallbacks:
 ### **For Production Deployment:**
 
 1. **Never commit environment files**
-2. **Use secure environment variable management**
-3. **Regularly rotate API keys and secrets**
-4. **Monitor for any exposed credentials**
-5. **Keep environment files backed up securely**
+2. **Configure EmailJS domain restrictions**
+3. **Use secure environment variable management**
+4. **Regularly rotate API keys and secrets**
+5. **Monitor for any exposed credentials**
+6. **Keep environment files backed up securely**
 
 ## 📞 Support
 
 For questions about security configuration or deployment:
 - Check `docs/ENVIRONMENT_SETUP.md` for detailed setup
+- Check `docs/EMAILJS_SECURITY.md` for EmailJS domain restrictions
 - Review `README.md` for general deployment guidance
 - Contact development team for security concerns
 
 ---
 
 **Security Audit Completed:** ✅  
+**EmailJS Domain Security:** ⚠️ **CONFIGURE REQUIRED**  
 **Repository Ready for Public Release:** ✅  
 **Last Updated:** December 2024 
