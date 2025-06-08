@@ -1,0 +1,49 @@
+[build]
+  # Build command
+  command = "npm ci && npm run build"
+  
+  # Directory with the static files
+  publish = "dist"
+  
+  # Base directory (should be root, not public)
+  base = "."
+
+[build.environment]
+  # Node version
+  NODE_VERSION = "18"
+  
+  # Prevent npm audit issues during build
+  NPM_FLAGS = "--no-audit --no-fund"
+
+# Environment variables (set these in Netlify UI with actual values from prod.env)
+# VITE_EMAILJS_PUBLIC_KEY = "your_emailjs_public_key_here"
+# VITE_EMAILJS_SERVICE_ID = "your_emailjs_service_id_here"
+# VITE_EMAILJS_USER_TEMPLATE = "your_user_template_id_here" 
+# VITE_EMAILJS_ADMIN_TEMPLATE = "your_admin_template_id_here"
+# VITE_GOOGLE_PLACES_API_KEY = "your_google_places_api_key_here"
+# VITE_GOOGLE_PLACES_PLACE_ID = "your_google_places_place_id_here"
+# VITE_INSTAGRAM_HANDLE = "your_instagram_handle"
+# VITE_YOUTUBE_HANDLE = "your_youtube_handle"
+# VITE_NODE_ENV = "production"
+# VITE_LOG_LEVEL = "error"
+
+# Redirect rules for SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers for security
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    
+# Cache static assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable" 
