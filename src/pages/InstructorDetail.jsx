@@ -29,7 +29,7 @@ const InstructorDetail = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.7 }}
     >
-      <motion.div className="bg-white/90 rounded-3xl shadow-2xl p-10 max-w-2xl w-full flex flex-col items-center relative" initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7 }}>
+      <motion.div className="p-10 max-w-4xl w-full flex flex-col items-center relative" initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.7 }}>
         <img src={instructor.image} alt={instructor.name} className="w-40 h-40 md:w-52 md:h-52 rounded-full object-cover border-4 border-pink-200 shadow mb-4" />
         <h1 className="text-3xl font-extrabold text-pink-700 mb-1 text-center">{instructor.name}</h1>
         <div className="text-pink-500 text-lg mb-4 text-center">{instructor.title}</div>
