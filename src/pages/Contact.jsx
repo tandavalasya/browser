@@ -115,7 +115,6 @@ const Contact = () => {
         <span className="text-gray-600">Or reach out on:</span>
         <div className="flex gap-4 mt-2">
           <a href={`https://instagram.com/${config.socials.instagram}`} className="text-pink-600 hover:text-pink-800 font-bold" target="_blank" rel="noopener noreferrer">Instagram</a>
-          <a href="#" className="text-blue-600 hover:text-blue-800 font-bold">Facebook</a>
           <a href={`https://youtube.com/${config.socials.youtube}`} className="text-red-600 hover:text-red-800 font-bold" target="_blank" rel="noopener noreferrer">YouTube</a>
         </div>
       </motion.div>
