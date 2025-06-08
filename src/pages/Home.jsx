@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { FaChevronLeft, FaChevronRight, FaGoogle } from 'react-icons/fa';
+import fetchGoogleReviews from '../services/googlePlaces';
 
 const containerVariants = {
   hidden: {},
@@ -34,19 +35,38 @@ const staggeredItem = {
 const Home = () => {
   const [siteReviews, setSiteReviews] = useState([]);
   const [googleReviews, setGoogleReviews] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const carouselRef = useRef(null);
   const controls = useAnimation();
 
   useEffect(() => {
-    // Load both types of reviews
-    Promise.all([
-      import('../config/reviews.json'),
-      import('../config/googleReviews.json')
-    ]).then(([siteMod, googleMod]) => {
-      setSiteReviews(siteMod.default || siteMod);
-      setGoogleReviews(googleMod.default || googleMod);
-    });
+    const loadReviews = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        // Load both types of reviews in parallel
+        const [siteMod, googleReviewsData] = await Promise.all([
+          import('../config/reviews.json'),
+          fetchGoogleReviews()
+        ]);
+
+        setSiteReviews(siteMod.default || siteMod);
+        setGoogleReviews(googleReviewsData);
+      } catch (err) {
+        console.error('Error loading reviews:', err);
+        setError('Unable to load reviews. Please try again later.');
+        // Still load site reviews even if Google reviews fail
+        const siteMod = await import('../config/reviews.json');
+        setSiteReviews(siteMod.default || siteMod);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadReviews();
   }, []);
 
   // Combine both types of reviews
@@ -122,65 +142,90 @@ const Home = () => {
           ))}
         </motion.ul>
       </motion.div>
-      {/* Reviews Carousel - floating above a soft background */}
+      {/* Reviews Carousel */}
       <motion.div className="w-full max-w-4xl mx-auto mt-8 mb-16 relative z-20 overflow-x-hidden">
         <h3 className="text-lg md:text-xl font-bold text-orange-600 mb-4 text-left">What Our Students Say</h3>
-        {/* Carousel Arrows */}
-        {allReviews.length > 1 && (
+        
+        {isLoading ? (
+          <div className="flex justify-center items-center h-48">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
+          </div>
+        ) : error ? (
+          <div className="text-center text-red-500 p-4 bg-red-50 rounded-lg">
+            {error}
+          </div>
+        ) : (
           <>
-            <button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 z-30 bg-white/80 hover:bg-pink-100 text-pink-600 rounded-full p-2 shadow transition-all"><FaChevronLeft size={22} /></button>
-            <button onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 z-30 bg-white/80 hover:bg-pink-100 text-pink-600 rounded-full p-2 shadow transition-all"><FaChevronRight size={22} /></button>
-          </>
-        )}
-        <motion.div
-          ref={carouselRef}
-          className="flex gap-8 px-2"
-          animate={controls}
-          transition={{ type: 'spring', stiffness: 40, damping: 20 }}
-          style={{ willChange: 'transform' }}
-        >
-          {allReviews.map((review, i) => (
+            {/* Carousel Arrows */}
+            {allReviews.length > 1 && (
+              <>
+                <button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 z-30 bg-white/80 hover:bg-pink-100 text-pink-600 rounded-full p-2 shadow transition-all"><FaChevronLeft size={22} /></button>
+                <button onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 z-30 bg-white/80 hover:bg-pink-100 text-pink-600 rounded-full p-2 shadow transition-all"><FaChevronRight size={22} /></button>
+              </>
+            )}
             <motion.div
-              key={review.id}
-              className={`bg-white rounded-2xl shadow-xl p-6 flex flex-col items-center text-center min-w-[300px] max-w-[300px] mx-auto relative hover:scale-105 transition-transform duration-300 ${review.source === 'google' ? 'border-2 border-blue-100' : ''}`}
-              whileHover={{ scale: 1.08 }}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 * i, duration: 0.7 }}
+              ref={carouselRef}
+              className="flex gap-8 px-2"
+              animate={controls}
+              transition={{ type: 'spring', stiffness: 40, damping: 20 }}
+              style={{ willChange: 'transform' }}
             >
-              {review.image && <img src={review.image} alt={review.name} className="w-14 h-14 rounded-full object-cover mb-2 border-2 border-pink-200 shadow" />}
-              <div className="font-semibold text-pink-700 mb-1 text-base flex items-center gap-2">
-                {review.name}
-                {review.source === 'google' && (
-                  <span className="text-blue-500" title="Google Review">
-                    <FaGoogle size={14} />
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center justify-center mb-2">
-                {[...Array(5)].map((_, idx) => (
-                  <span key={idx} className={idx < review.rating ? 'text-yellow-400 text-lg' : 'text-gray-300 text-lg'}>★</span>
+              {allReviews.map((review, i) => (
+                <motion.div
+                  key={review.id}
+                  className={`bg-white rounded-2xl shadow-xl p-6 flex flex-col items-center text-center min-w-[300px] max-w-[300px] mx-auto relative hover:scale-105 transition-transform duration-300 ${review.source === 'google' ? 'border-2 border-blue-100' : ''}`}
+                  whileHover={{ scale: 1.08 }}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 * i, duration: 0.7 }}
+                >
+                  {review.image && <img src={review.image} alt={review.name} className="w-14 h-14 rounded-full object-cover mb-2 border-2 border-pink-200 shadow" />}
+                  <div className="font-semibold text-pink-700 mb-1 text-base flex items-center gap-2">
+                    {review.name}
+                    {review.source === 'google' && (
+                      <a 
+                        href={`https://www.google.com/maps/place/?q=place_id:${process.env.REACT_APP_TANDAVALASYA_PLACE_ID}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:text-blue-600 transition-colors"
+                        title="View on Google"
+                      >
+                        <FaGoogle size={14} />
+                      </a>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-center mb-2">
+                    {[...Array(5)].map((_, idx) => (
+                      <span key={idx} className={idx < review.rating ? 'text-yellow-400 text-lg' : 'text-gray-300 text-lg'}>★</span>
+                    ))}
+                  </div>
+                  <div className="text-gray-700 text-base leading-relaxed">{review.review}</div>
+                  {review.date && (
+                    <div className="text-sm text-gray-400 mt-2">
+                      {new Date(review.date).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+            </motion.div>
+            {/* Carousel Dots */}
+            {allReviews.length > 1 && (
+              <div className="flex justify-center gap-2 mt-4">
+                {allReviews.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => goTo(idx)}
+                    className={`w-3 h-3 rounded-full border-2 ${currentIndex === idx ? 'bg-pink-500 border-pink-500' : 'bg-white border-pink-300'} transition-all`}
+                    aria-label={`Go to review ${idx + 1}`}
+                  />
                 ))}
               </div>
-              <div className="text-gray-700 text-base leading-relaxed">{review.review}</div>
-              {review.date && (
-                <div className="text-sm text-gray-400 mt-2">{new Date(review.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
-              )}
-            </motion.div>
-          ))}
-        </motion.div>
-        {/* Carousel Dots */}
-        {allReviews.length > 1 && (
-          <div className="flex justify-center gap-2 mt-4">
-            {allReviews.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => goTo(idx)}
-                className={`w-3 h-3 rounded-full border-2 ${currentIndex === idx ? 'bg-pink-500 border-pink-500' : 'bg-white border-pink-300'} transition-all`}
-                aria-label={`Go to review ${idx + 1}`}
-              />
-            ))}
-          </div>
+            )}
+          </>
         )}
       </motion.div>
       {/* Call to Action */}
