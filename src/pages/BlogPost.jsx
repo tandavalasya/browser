@@ -37,9 +37,9 @@ const BlogPost = () => {
       <motion.div variants={itemVariants} whileHover={{ scale: 1.03 }}>
         <img src={post.image} alt={post.title} className="w-full h-64 object-cover rounded-lg mb-6 transition-transform duration-300" />
       </motion.div>
-      <motion.h1 className="text-4xl font-bold mb-2 text-pink-700" variants={itemVariants}>{post.title}</motion.h1>
-      <motion.p className="text-gray-400 mb-6" variants={itemVariants}>{post.date}</motion.p>
-      <motion.article className="prose prose-pink max-w-none" variants={itemVariants}>
+      <motion.h1 className="text-4xl font-bold mb-2 text-pink-700 text-left" variants={itemVariants}>{post.title}</motion.h1>
+      <motion.p className="text-gray-400 mb-6 text-left" variants={itemVariants}>{post.date}</motion.p>
+      <motion.article className="prose prose-pink max-w-none text-left" variants={itemVariants}>
         <ReactMarkdown>{post.content}</ReactMarkdown>
       </motion.article>
     </motion.section>

@@ -123,7 +123,7 @@ const Schedule = () => {
       variants={containerVariants}
     >
       <motion.h2
-        className="text-3xl font-bold mb-8 text-center text-orange-700"
+        className="text-3xl font-bold mb-8 text-center text-orange-700 max-w-3xl mx-auto"
         variants={itemVariants}
       >
         Schedule
@@ -145,7 +145,7 @@ const Schedule = () => {
       {error && <motion.div className="text-center text-red-600" variants={itemVariants}>Error loading schedule.</motion.div>}
       {!loading && !error && rows && rows.length > 0 && (
         <motion.div className="overflow-x-auto" variants={itemVariants}>
-          <table className="min-w-full w-full rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-white via-orange-50 to-pink-50 border-0">
+          <table className="min-w-full w-full rounded-3xl overflow-hidden border-0">
             <thead>
               <tr>
                 {headers.map((header) => (

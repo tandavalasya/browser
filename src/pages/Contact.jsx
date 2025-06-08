@@ -77,14 +77,14 @@ const Contact = () => {
       variants={containerVariants}
     >
       <motion.h2
-        className="text-3xl font-bold mb-8 text-center text-blue-700"
+        className="text-3xl font-bold mb-8 text-center text-blue-700 max-w-xl mx-auto"
         variants={itemVariants}
       >
         Contact
       </motion.h2>
       <motion.form
         onSubmit={handleSubmit}
-        className="bg-white rounded-xl shadow-md p-8 flex flex-col gap-4"
+        className="rounded-xl p-8 flex flex-col gap-4"
         variants={itemVariants}
       >
         <motion.input name="name" type="text" placeholder="Your Name" value={form.name} onChange={handleChange} className="px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400" required variants={itemVariants} />

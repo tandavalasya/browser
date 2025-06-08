@@ -29,7 +29,7 @@ const Blog = () => {
   return (
     <section className="max-w-4xl mx-auto py-12 px-2 sm:px-4">
       <motion.h2
-        className="text-3xl font-bold mb-8 text-center text-pink-700"
+        className="text-3xl font-bold mb-8 text-center text-pink-700 max-w-4xl mx-auto"
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7 }}
