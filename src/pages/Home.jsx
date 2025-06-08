@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaGoogle } from 'react-icons/fa';
 
 const containerVariants = {
   hidden: {},
@@ -32,29 +32,44 @@ const staggeredItem = {
 };
 
 const Home = () => {
-  const [reviews, setReviews] = useState([]);
+  const [siteReviews, setSiteReviews] = useState([]);
+  const [googleReviews, setGoogleReviews] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const carouselRef = useRef(null);
   const controls = useAnimation();
+
   useEffect(() => {
-    import('../config/reviews.json').then((mod) => setReviews(mod.default || mod));
+    // Load both types of reviews
+    Promise.all([
+      import('../config/reviews.json'),
+      import('../config/googleReviews.json')
+    ]).then(([siteMod, googleMod]) => {
+      setSiteReviews(siteMod.default || siteMod);
+      setGoogleReviews(googleMod.default || googleMod);
+    });
   }, []);
+
+  // Combine both types of reviews
+  const allReviews = [...siteReviews, ...googleReviews];
+
   // Auto-scroll logic
   useEffect(() => {
-    if (reviews.length <= 1) return;
+    if (allReviews.length <= 1) return;
     let index = currentIndex;
     const interval = setInterval(() => {
-      index = (index + 1) % reviews.length;
+      index = (index + 1) % allReviews.length;
       setCurrentIndex(index);
     }, 3500);
     return () => clearInterval(interval);
-  }, [reviews, currentIndex]);
+  }, [allReviews, currentIndex]);
+
   useEffect(() => {
     controls.start({ x: -currentIndex * 340 });
   }, [currentIndex, controls]);
+
   const goTo = (idx) => setCurrentIndex(idx);
-  const prev = () => setCurrentIndex((prev) => (prev === 0 ? reviews.length - 1 : prev - 1));
-  const next = () => setCurrentIndex((prev) => (prev === reviews.length - 1 ? 0 : prev + 1));
+  const prev = () => setCurrentIndex((prev) => (prev === 0 ? allReviews.length - 1 : prev - 1));
+  const next = () => setCurrentIndex((prev) => (prev === allReviews.length - 1 ? 0 : prev + 1));
 
   return (
     <div className="relative flex flex-col w-full pb-20">
@@ -111,7 +126,7 @@ const Home = () => {
       <motion.div className="w-full max-w-4xl mx-auto mt-8 mb-16 relative z-20 overflow-x-hidden">
         <h3 className="text-lg md:text-xl font-bold text-orange-600 mb-4 text-left">What Our Students Say</h3>
         {/* Carousel Arrows */}
-        {reviews.length > 1 && (
+        {allReviews.length > 1 && (
           <>
             <button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 z-30 bg-white/80 hover:bg-pink-100 text-pink-600 rounded-full p-2 shadow transition-all"><FaChevronLeft size={22} /></button>
             <button onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 z-30 bg-white/80 hover:bg-pink-100 text-pink-600 rounded-full p-2 shadow transition-all"><FaChevronRight size={22} /></button>
@@ -124,30 +139,40 @@ const Home = () => {
           transition={{ type: 'spring', stiffness: 40, damping: 20 }}
           style={{ willChange: 'transform' }}
         >
-          {reviews.map((review, i) => (
+          {allReviews.map((review, i) => (
             <motion.div
               key={review.id}
-              className="bg-white rounded-2xl shadow-xl p-6 flex flex-col items-center text-center min-w-[300px] max-w-[300px] mx-auto relative hover:scale-105 transition-transform duration-300"
+              className={`bg-white rounded-2xl shadow-xl p-6 flex flex-col items-center text-center min-w-[300px] max-w-[300px] mx-auto relative hover:scale-105 transition-transform duration-300 ${review.source === 'google' ? 'border-2 border-blue-100' : ''}`}
               whileHover={{ scale: 1.08 }}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 * i, duration: 0.7 }}
             >
               {review.image && <img src={review.image} alt={review.name} className="w-14 h-14 rounded-full object-cover mb-2 border-2 border-pink-200 shadow" />}
-              <div className="font-semibold text-pink-700 mb-1 text-base">{review.name}</div>
+              <div className="font-semibold text-pink-700 mb-1 text-base flex items-center gap-2">
+                {review.name}
+                {review.source === 'google' && (
+                  <span className="text-blue-500" title="Google Review">
+                    <FaGoogle size={14} />
+                  </span>
+                )}
+              </div>
               <div className="flex items-center justify-center mb-2">
                 {[...Array(5)].map((_, idx) => (
                   <span key={idx} className={idx < review.rating ? 'text-yellow-400 text-lg' : 'text-gray-300 text-lg'}>★</span>
                 ))}
               </div>
               <div className="text-gray-700 text-base leading-relaxed">{review.review}</div>
+              {review.date && (
+                <div className="text-sm text-gray-400 mt-2">{new Date(review.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+              )}
             </motion.div>
           ))}
         </motion.div>
         {/* Carousel Dots */}
-        {reviews.length > 1 && (
+        {allReviews.length > 1 && (
           <div className="flex justify-center gap-2 mt-4">
-            {reviews.map((_, idx) => (
+            {allReviews.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => goTo(idx)}

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "google1",
+    "name": "Priya Sharma",
+    "rating": 5,
+    "date": "2024-02-15",
+    "review": "An exceptional dance school that truly understands the art of Bharatanatyam. The teachers are knowledgeable and patient, making learning a joy.",
+    "source": "google"
+  },
+  {
+    "id": "google2",
+    "name": "Rajesh Kumar",
+    "rating": 5,
+    "date": "2024-01-20",
+    "review": "My daughter has been learning here for 2 years and her progress is remarkable. The school focuses on both technique and expression.",
+    "source": "google"
+  },
+  {
+    "id": "google3",
+    "name": "Ananya Patel",
+    "rating": 5,
+    "date": "2023-12-10",
+    "review": "The best Bharatanatyam school in the area. Professional teaching, great facilities, and a wonderful learning environment.",
+    "source": "google"
+  }
+] 
