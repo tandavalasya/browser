@@ -69,19 +69,22 @@ const Home = () => {
         variants={containerVariants}
       >
         <motion.div
-          className="w-20 h-20 rounded-full bg-gradient-to-tr from-white via-pink-50 to-orange-100 flex items-center justify-center mb-4 shadow-xl border-2 border-pink-200 z-10"
-          animate={{ scale: [1, 1.08, 1] }}
-          transition={{ repeat: Infinity, duration: 2 }}
+          className="mb-4 z-10 flex flex-col md:flex-row md:items-center md:justify-start w-full"
           variants={itemVariants}
         >
-          <img src="/logo.png" alt="TandavaLasya Logo" className="w-16 h-16 object-cover drop-shadow-md" />
+          <div className="mx-auto md:mx-0 w-20 h-20 md:w-32 md:h-32 rounded-full bg-gradient-to-tr from-white via-pink-50 to-orange-100 flex items-center justify-center shadow-xl border-2 border-pink-200"
+            style={{ minWidth: '5rem', minHeight: '5rem' }}>
+            <img src="/logo.png" alt="TandavaLasya Logo" className="w-16 h-16 md:w-24 md:h-24 object-cover drop-shadow-md" />
+          </div>
+          <div className="flex flex-col justify-center md:ml-6 md:mt-0 mt-4 text-center md:text-left w-full">
+            <motion.h1 className="text-3xl md:text-5xl font-extrabold mb-2 tracking-tight drop-shadow-lg z-10 text-pink-700" variants={itemVariants}>
+              TandavaLasya
+            </motion.h1>
+            <motion.h2 className="text-lg md:text-2xl font-semibold mb-4 text-orange-600 z-10" variants={itemVariants}>
+              Bharatanatyam Dance School
+            </motion.h2>
+          </div>
         </motion.div>
-        <motion.h1 className="text-3xl md:text-5xl font-extrabold mb-2 tracking-tight drop-shadow-lg z-10 text-pink-700" variants={itemVariants}>
-          TandavaLasya
-        </motion.h1>
-        <motion.h2 className="text-lg md:text-2xl font-semibold mb-4 text-orange-600 z-10" variants={itemVariants}>
-          Bharatanatyam Dance School
-        </motion.h2>
         <motion.p className="max-w-2xl text-base md:text-lg mb-6 text-gray-700 z-10" variants={itemVariants}>
           Welcome to TandavaLasya, where tradition meets innovation. Led by <span className="font-bold text-pink-600">Bhargavi Venkataraman</span>, MFA (Bharatanatyam), Grade B Doordarshan artist, and award-winning performer, our school inspires students of all ages to discover the joy and discipline of Bharatanatyam.
         </motion.p>
