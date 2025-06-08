@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 const containerVariants = {
   hidden: {},
@@ -32,6 +33,7 @@ const staggeredItem = {
 
 const Home = () => {
   const [reviews, setReviews] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const carouselRef = useRef(null);
   const controls = useAnimation();
   useEffect(() => {
@@ -39,16 +41,20 @@ const Home = () => {
   }, []);
   // Auto-scroll logic
   useEffect(() => {
-    let interval;
-    if (reviews.length > 1) {
-      let index = 0;
-      interval = setInterval(() => {
-        index = (index + 1) % reviews.length;
-        controls.start({ x: -index * 340 });
-      }, 3500);
-    }
+    if (reviews.length <= 1) return;
+    let index = currentIndex;
+    const interval = setInterval(() => {
+      index = (index + 1) % reviews.length;
+      setCurrentIndex(index);
+    }, 3500);
     return () => clearInterval(interval);
-  }, [reviews, controls]);
+  }, [reviews, currentIndex]);
+  useEffect(() => {
+    controls.start({ x: -currentIndex * 340 });
+  }, [currentIndex, controls]);
+  const goTo = (idx) => setCurrentIndex(idx);
+  const prev = () => setCurrentIndex((prev) => (prev === 0 ? reviews.length - 1 : prev - 1));
+  const next = () => setCurrentIndex((prev) => (prev === reviews.length - 1 ? 0 : prev + 1));
 
   return (
     <div className="relative flex flex-col items-center justify-center w-full pb-20">
@@ -130,6 +136,13 @@ const Home = () => {
       {/* Reviews Carousel - floating above a soft background */}
       <motion.div className="w-full max-w-4xl mx-auto mt-8 mb-16 relative z-20 overflow-x-hidden">
         <h3 className="text-lg md:text-xl font-bold text-orange-600 mb-4 text-center">What Our Students Say</h3>
+        {/* Carousel Arrows */}
+        {reviews.length > 1 && (
+          <>
+            <button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 z-30 bg-white/80 hover:bg-pink-100 text-pink-600 rounded-full p-2 shadow transition-all"><FaChevronLeft size={22} /></button>
+            <button onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 z-30 bg-white/80 hover:bg-pink-100 text-pink-600 rounded-full p-2 shadow transition-all"><FaChevronRight size={22} /></button>
+          </>
+        )}
         <motion.div
           ref={carouselRef}
           className="flex gap-8 px-2"
@@ -157,6 +170,19 @@ const Home = () => {
             </motion.div>
           ))}
         </motion.div>
+        {/* Carousel Dots */}
+        {reviews.length > 1 && (
+          <div className="flex justify-center gap-2 mt-4">
+            {reviews.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => goTo(idx)}
+                className={`w-3 h-3 rounded-full border-2 ${currentIndex === idx ? 'bg-pink-500 border-pink-500' : 'bg-white border-pink-300'} transition-all`}
+                aria-label={`Go to review ${idx + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </motion.div>
       {/* Call to Action */}
       <motion.div className="w-full max-w-3xl mx-auto flex flex-col items-center mb-8 z-10" initial="hidden" whileInView="show" viewport={{ once: true }} variants={containerVariants}>
