@@ -1,5 +1,5 @@
 // Service to handle Google Places API interactions
-import { loadGooglePlacesAPI } from '../utils/googlePlacesLoader';
+import { loadGooglePlacesApi } from '../utils/googlePlacesLoader';
 import googlePlacesConfig from '../config/googlePlaces.json';
 
 // Supported fields for Places API
@@ -16,7 +16,7 @@ export async function fetchPlaceReviews() {
       throw new Error(`Unsupported fields requested: ${invalidFields.join(', ')}`);
     }
 
-    await loadGooglePlacesAPI();
+    await loadGooglePlacesApi();
     
     // Create a hidden div for the map
     mapDiv = document.createElement('div');
