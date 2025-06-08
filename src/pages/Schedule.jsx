@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useGoogleSheetCSV } from '../utils/useGoogleSheetCSV';
@@ -14,12 +14,7 @@ function getCellClass(value) {
     colorMap[k.trim().toLowerCase()] = v;
   });
   const colorClass = colorMap[normalizedValue];
-  // Debug color mapping
-  if (!colorClass) {
-    console.log('COLOR MAP FAIL:', { value, normalizedValue, colorMapKeys: Object.keys(colorMap) });
-  } else {
-    console.log('COLOR MAP SUCCESS:', { value, normalizedValue, colorClass });
-  }
+
   return colorClass || 'bg-gray-100 text-gray-500';
 }
 
@@ -79,41 +74,10 @@ const Schedule = () => {
   const rows = data;
   const rowSpans = calculateRowSpansHour(rows, headers);
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-  const [scheduleData, setScheduleData] = useState({ headers, rows });
-  const [colorMap, setColorMap] = useState(classColors);
-
-  useEffect(() => {
-    const fetchSchedule = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const response = await fetch(googlePlacesConfig.scheduleUrl);
-        if (!response.ok) {
-          throw new Error('Failed to fetch schedule data');
-        }
-
-        const data = await response.text();
-        const { headers, rows } = parseCSV(data);
-
-        if (!headers.length || !rows.length) {
-          throw new Error('Invalid schedule data format');
-        }
-
-        setScheduleData({ headers, rows });
-      } catch (err) {
-        setError('Unable to load schedule. Please try again later.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchSchedule();
-  }, []);
+  const [colorMap] = useState(classColors);
 
   const renderCell = (value, header, i, j) => {
-    const span = value === scheduleData.rows[i - 1]?.[j] ? 0 : 1;
+    const span = value === rows[i - 1]?.[j] ? 0 : 1;
     const colorClass = getColorClass(value, colorMap);
 
     return (
@@ -207,10 +171,7 @@ const Schedule = () => {
                     const isEmpty = value === '' || value === undefined || value === null;
                     const isFirstOfPair = i % 2 === 0;
                     const cellClass = isClassColumn(header, j) ? getCellClass(value || '') : 'bg-white text-gray-700';
-                    // Debug log for non-empty values
-                    if (!isEmpty) {
-                      console.log(`RENDERING: Cell [row ${i}, col ${j}, header '${header}']: value=`, value, '| span=', span);
-                    }
+
                     if (isEmpty && isFirstOfPair && isClassColumn(header, j)) {
                       return (
                         <td

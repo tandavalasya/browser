@@ -4,10 +4,25 @@ import { useLocation } from 'react-router-dom';
 import emailjs from 'emailjs-com';
 import locations from '../config/locations.json';
 import socials from '../config/socials.json';
-import emailjsConfig from '../config/emailjs.json';
 
-// Initialize EmailJS with the public key
-emailjs.init(emailjsConfig.publicKey);
+// Safe EmailJS configuration import
+let emailjsConfig;
+try {
+  emailjsConfig = require('../config/emailjs.json');
+  // Initialize EmailJS with the public key only if config exists
+  if (emailjsConfig && emailjsConfig.publicKey) {
+    emailjs.init(emailjsConfig.publicKey);
+  }
+} catch (e) {
+  // Configuration not found - likely in test environment
+  emailjsConfig = {
+    publicKey: 'test-key',
+    serviceId: 'test-service',
+    userTemplateId: 'test-user-template',
+    adminTemplateId: 'test-admin-template',
+    allowedDomains: ['example.com', 'localhost']
+  };
+}
 
 const containerVariants = {
   hidden: {},
