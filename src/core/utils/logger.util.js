@@ -6,8 +6,30 @@
 
 class Logger {
   constructor() {
-    this.isDevelopment = process.env.NODE_ENV === 'development';
-    this.logLevel = process.env.REACT_APP_LOG_LEVEL || 'info';
+    // Safe browser environment checks
+    this.isDevelopment = this.#getSafeEnvVar('NODE_ENV') === 'development';
+    this.logLevel = this.#getSafeEnvVar('REACT_APP_LOG_LEVEL') || 'info';
+  }
+
+  #getSafeEnvVar(key) {
+    try {
+      // In Node.js environment (tests, SSR)
+      if (typeof process !== 'undefined' && process.env) {
+        return process.env[key];
+      }
+      
+      // In browser environment, use safe defaults
+      // Environment variables should be injected at build time by bundler
+      if (typeof window !== 'undefined') {
+        return key === 'NODE_ENV' ? 'production' : undefined;
+      }
+      
+      // Default fallback
+      return key === 'NODE_ENV' ? 'production' : undefined;
+    } catch (error) {
+      // Final fallback if any error occurs
+      return key === 'NODE_ENV' ? 'production' : undefined;
+    }
   }
 
   #shouldLog(level) {

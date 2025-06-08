@@ -113,17 +113,24 @@ export const AnimationWrapper = ({
   as = 'div',
   className = '',
   style = {},
-  ...motionProps
+  motionProps = {},
+  ...domProps
 }) => {
   const MotionComponent = motion[as] || motion.div;
   const animationConfig = customVariants || ANIMATION_VARIANTS[variant] || ANIMATION_VARIANTS.fadeIn;
 
+  // Merge animation config with custom motion props
+  const finalAnimationConfig = {
+    ...animationConfig,
+    ...motionProps
+  };
+
   return (
     <MotionComponent
-      {...animationConfig}
+      {...finalAnimationConfig}
       className={className}
       style={style}
-      {...motionProps}
+      {...domProps}
     >
       {children}
     </MotionComponent>

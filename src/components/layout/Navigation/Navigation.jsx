@@ -13,7 +13,6 @@ import { motion } from 'framer-motion';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 
 import { ANIMATION_CONSTANTS } from '../../../core/constants/app.constants.js';
-import socials from '../../../config/socials.json';
 
 /**
  * Animated Navigation Link Component
@@ -28,9 +27,9 @@ const AnimatedNavLink = ({ to, children, onClick = null }) => {
     <Link
       to={to}
       onClick={onClick}
-      className={`relative px-1 transition-colors ${
+      className={`relative px-4 py-2 text-sm font-medium tracking-wide transition-all duration-300 ${
         isActive 
-          ? 'text-pink-600 font-medium' 
+          ? 'text-pink-600 font-semibold' 
           : 'text-gray-700 hover:text-pink-600'
       }`}
       onMouseEnter={() => setHovered(true)}
@@ -39,13 +38,27 @@ const AnimatedNavLink = ({ to, children, onClick = null }) => {
       {children}
       <motion.div
         layoutId="nav-underline"
-        className="absolute left-0 -bottom-1 h-0.5 bg-pink-500 rounded"
+        className="absolute left-0 -bottom-1 h-0.5 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full"
         initial={false}
         animate={{ 
           width: (hovered || isActive) ? '100%' : '0%' 
         }}
         transition={{ duration: ANIMATION_CONSTANTS.UNDERLINE.duration }}
       />
+    </Link>
+  );
+};
+
+/**
+ * Call to Action Button Component
+ */
+const CTAButton = () => {
+  return (
+    <Link
+      to="/contact"
+      className="hidden md:inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold text-white bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+    >
+      Get Started
     </Link>
   );
 };
@@ -68,7 +81,7 @@ const MobileMenu = ({ isOpen, onClose, navigationItems }) => {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-25" />
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
         </Transition.Child>
 
         {/* Menu Panel */}
@@ -83,12 +96,12 @@ const MobileMenu = ({ isOpen, onClose, navigationItems }) => {
               leaveFrom="opacity-100 scale-100 translate-x-0"
               leaveTo="opacity-0 scale-95 translate-x-full"
             >
-              <Dialog.Panel className="w-full max-w-sm transform overflow-hidden rounded-lg bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-sm transform overflow-hidden rounded-2xl bg-white/95 backdrop-blur-md p-6 text-left align-middle shadow-2xl transition-all border border-gray-200/50">
                 {/* Close Button */}
-                <div className="flex justify-end mb-4">
+                <div className="flex justify-end mb-6">
                   <button
                     onClick={onClose}
-                    className="rounded-md p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 transition-colors"
+                    className="rounded-full p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100/80 transition-all duration-200"
                     aria-label="Close menu"
                   >
                     <XMarkIcon className="h-6 w-6" />
@@ -96,35 +109,28 @@ const MobileMenu = ({ isOpen, onClose, navigationItems }) => {
                 </div>
 
                 {/* Navigation Links */}
-                <nav className="space-y-4">
+                <nav className="space-y-2">
                   {navigationItems.map((item) => (
                     <Link
                       key={item.key}
                       to={item.to}
                       onClick={onClose}
-                      className="block px-3 py-2 text-lg font-medium text-gray-700 hover:text-pink-600 hover:bg-pink-50 rounded-md transition-colors"
+                      className="block px-4 py-3 text-lg font-medium text-gray-700 hover:text-pink-600 hover:bg-pink-50/80 rounded-xl transition-all duration-200"
                     >
                       {item.label}
                     </Link>
                   ))}
                 </nav>
 
-                {/* Social Links */}
-                <div className="mt-8 pt-6 border-t border-gray-200">
-                  <div className="flex space-x-4 justify-center">
-                    {socials.map((social) => (
-                      <a
-                        key={social.name}
-                        href={social.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-gray-400 hover:text-pink-500 transition-colors"
-                        aria-label={social.name}
-                      >
-                        <span className="text-xl">{social.icon}</span>
-                      </a>
-                    ))}
-                  </div>
+                {/* Mobile CTA */}
+                <div className="mt-8 pt-6 border-t border-gray-200/50">
+                  <Link
+                    to="/contact"
+                    onClick={onClose}
+                    className="block w-full px-4 py-3 text-center text-white font-semibold bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 rounded-xl transition-all duration-200 shadow-md"
+                  >
+                    Get Started
+                  </Link>
                 </div>
               </Dialog.Panel>
             </Transition.Child>
@@ -147,7 +153,7 @@ const Navigation = ({
   return (
     <>
       {/* Main Navigation Bar */}
-      <nav className="relative z-30 bg-white/80 backdrop-blur-md border-b border-gray-200/50">
+      <nav className="sticky top-0 z-30 bg-white/90 backdrop-blur-lg border-b border-gray-200/20 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
@@ -160,9 +166,9 @@ const Navigation = ({
               </Link>
             </div>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-8">
+            {/* Desktop Navigation - Centered */}
+            <div className="hidden md:flex flex-1 justify-center">
+              <div className="flex items-center space-x-2">
                 {navigationItems.map((item) => (
                   <AnimatedNavLink key={item.key} to={item.to}>
                     {item.label}
@@ -171,27 +177,16 @@ const Navigation = ({
               </div>
             </div>
 
-            {/* Social Links - Desktop */}
-            <div className="hidden md:flex items-center space-x-4">
-              {socials.map((social) => (
-                <a
-                  key={social.name}
-                  href={social.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-pink-500 transition-colors"
-                  aria-label={social.name}
-                >
-                  <span className="text-lg">{social.icon}</span>
-                </a>
-              ))}
+            {/* CTA Button - Desktop */}
+            <div className="hidden md:flex items-center">
+              <CTAButton />
             </div>
 
             {/* Mobile Menu Button */}
             <div className="md:hidden">
               <button
                 onClick={onMobileMenuToggle}
-                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 transition-colors"
+                className="inline-flex items-center justify-center p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100/80 transition-all duration-200"
                 aria-label="Toggle menu"
               >
                 <Bars3Icon className="h-6 w-6" />
@@ -211,4 +206,4 @@ const Navigation = ({
   );
 };
 
-export default Navigation; 
+export default Navigation;

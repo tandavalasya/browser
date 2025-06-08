@@ -258,29 +258,38 @@ function App() {
   useEffect(() => {
     const initializeApp = async () => {
       try {
+        // Safe environment variable access
+        const safeEnvAccess = (key, defaultValue = undefined) => {
+          try {
+            return typeof process !== 'undefined' && process.env ? process.env[key] : defaultValue;
+          } catch {
+            return defaultValue;
+          }
+        };
+
         logger.info('TandavaLasya App initialization started', {
-          environment: process.env.NODE_ENV,
-          version: process.env.REACT_APP_VERSION || '1.0.0',
+          environment: safeEnvAccess('NODE_ENV', 'production'),
+          version: safeEnvAccess('REACT_APP_VERSION', '1.0.0'),
           timestamp: new Date().toISOString(),
-          userAgent: navigator.userAgent,
-          language: navigator.language,
+          userAgent: navigator?.userAgent || 'Unknown',
+          language: navigator?.language || 'en',
           viewport: {
-            width: window.innerWidth,
-            height: window.innerHeight
+            width: window?.innerWidth || 0,
+            height: window?.innerHeight || 0
           }
         });
 
-        // Simulate any async initialization if needed
-        await new Promise(resolve => setTimeout(resolve, 100));
-
+        // Simple initialization without complex async operations
         setAppInitialized(true);
         
         logger.info('TandavaLasya App initialization completed successfully');
       } catch (error) {
-        const handledError = errorHandler.handle(error, 'App Initialization');
-        logger.error('App initialization failed', handledError);
+        logger.error('App initialization error', { 
+          message: error?.message || 'Unknown error',
+          name: error?.name || 'Error'
+        });
         
-        // Still set initialized to true for graceful degradation
+        // Always set initialized to true for graceful degradation
         setAppInitialized(true);
       }
     };
@@ -322,7 +331,12 @@ function App() {
         // Could perform any necessary cleanup or reinitialization
       }}
     >
-      <Router>
+      <Router
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true
+        }}
+      >
         <AppLayout>
           <AnimatedRoutes />
         </AppLayout>

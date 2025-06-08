@@ -148,7 +148,14 @@ function ContactForm({ prefillMessage }) {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
-  const [emailService] = useState(() => new EmailService());
+  const [emailService] = useState(() => {
+    try {
+      return new EmailService();
+    } catch (error) {
+      logger.error('EmailService initialization failed', { error: error.message });
+      return null;
+    }
+  });
 
   // Pre-fill message if present
   useEffect(() => {
@@ -209,6 +216,9 @@ function ContactForm({ prefillMessage }) {
       };
 
       // Send email using service
+      if (!emailService) {
+        throw new Error('Email service not available');
+      }
       await emailService.sendContactForm(emailData);
 
       setSubmitStatus('success');
@@ -238,7 +248,7 @@ function ContactForm({ prefillMessage }) {
 
   return (
     <StaggerContainer>
-      <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+      <form onSubmit={handleSubmit} className="space-y-6" noValidate role="form">
         {/* Name Field */}
         <AnimationWrapper variant="fadeIn" motionProps={{ transition: { delay: 0.1 } }}>
           <div className="space-y-2">

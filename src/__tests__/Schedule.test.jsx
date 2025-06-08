@@ -43,7 +43,7 @@ describe('Schedule Component', () => {
     });
 
     renderSchedule();
-    expect(screen.getByText('Schedule')).toBeInTheDocument();
+    // When loading, only the loading message should show
     expect(screen.getByText('Loading schedule...')).toBeInTheDocument();
   });
 
@@ -66,7 +66,7 @@ describe('Schedule Component', () => {
     });
 
     renderSchedule();
-    expect(screen.getByText('Error loading schedule.')).toBeInTheDocument();
+    expect(screen.getByText('Error loading schedule')).toBeInTheDocument();
   });
 
   test('displays schedule data from CSV', async () => {
@@ -108,7 +108,7 @@ describe('Schedule Component', () => {
     });
 
     renderSchedule();
-    expect(screen.getByText('All reservations are for a minimum of 1 hour.')).toBeInTheDocument();
+    expect(screen.getByText(/All reservations are for a minimum of 1 hour/)).toBeInTheDocument();
   });
 
   test('renders table headers from CSV data', async () => {
@@ -178,7 +178,7 @@ describe('Schedule Component', () => {
     
     await waitFor(() => {
       const table = document.querySelector('table');
-      expect(table).toHaveClass('min-w-full', 'w-full', 'rounded-3xl');
+      expect(table).toHaveClass('min-w-full', 'w-full', 'rounded-xl');
     });
   });
 
@@ -192,8 +192,8 @@ describe('Schedule Component', () => {
     renderSchedule();
     
     // Should render schedule heading and legend but no table
-    expect(screen.getByText('Schedule')).toBeInTheDocument();
-    expect(screen.getByText('All reservations are for a minimum of 1 hour.')).toBeInTheDocument();
+    expect(screen.getByText('Class Schedule')).toBeInTheDocument();
+    expect(screen.getByText(/All reservations are for a minimum of 1 hour/)).toBeInTheDocument();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 

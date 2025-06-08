@@ -27,12 +27,11 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 // Core utilities and services
-import { logger } from '../core/utils/logger.util.js';
-import { errorHandler } from '../core/utils/error-handler.util.js';
-import { GooglePlacesService } from '../core/services/google-places.service.js';
+import { Logger } from '../core/utils/logger.util.js';
+import { ErrorHandler } from '../core/utils/error-handler.util.js';
 
 // UI Components
-import ErrorBoundary from '../components/ui/ErrorBoundary/ErrorBoundary.jsx';
+import { ErrorBoundary } from '../components/ui/ErrorBoundary/ErrorBoundary.jsx';
 import { 
   AnimationWrapper, 
   StaggerContainer, 
@@ -40,15 +39,15 @@ import {
 } from '../components/ui/Animation/AnimationWrapper.jsx';
 
 // Configuration and constants
-import { 
-  ANIMATION_CONSTANTS, 
-  ERROR_CONSTANTS, 
-  SUCCESS_CONSTANTS 
-} from '../core/constants/app.constants.js';
+import { APP_CONSTANTS } from '../core/constants/app.constants.js';
 
 // Local data
 import instructorsData from '../config/instructors.json';
 import reviewsData from '../config/reviews.json';
+
+// Initialize services
+const logger = new Logger('Home');
+const errorHandler = new ErrorHandler();
 
 /**
  * Hero Section Component
@@ -127,13 +126,21 @@ function ReviewCard({ review }) {
   }
 
   const {
-    author = 'Anonymous',
+    name = 'Anonymous',
+    author = name,
     rating = 5,
-    text = '',
+    review: text = '',
+    text: fallbackText = text,
     date = new Date().toISOString(),
-    profilePhoto = null,
+    image: profilePhoto = null,
+    profilePhoto: fallbackPhoto = profilePhoto,
     source = 'site'
   } = review;
+
+  // Use the correct properties from our data structure
+  const displayName = name || author || 'Anonymous';
+  const displayText = text || fallbackText || '';
+  const displayPhoto = profilePhoto || fallbackPhoto;
 
   const formattedDate = useMemo(() => {
     try {
@@ -150,21 +157,21 @@ function ReviewCard({ review }) {
 
   const handleImageError = useCallback((e) => {
     logger.warn('Review profile photo failed to load', { 
-      author, 
+      author: displayName, 
       originalSrc: e.target.src 
     });
     e.target.style.display = 'none';
-  }, [author]);
+  }, [displayName]);
 
   return (
-    <ScaleWrapper>
+    <AnimationWrapper variant="scale">
       <div className="bg-white rounded-xl shadow-lg p-6 h-full flex flex-col hover:shadow-xl transition-shadow duration-300">
         {/* Review Header */}
         <div className="flex items-center mb-4">
-          {profilePhoto ? (
+          {displayPhoto ? (
             <img
-              src={profilePhoto}
-              alt={`${author}'s profile`}
+              src={displayPhoto}
+              alt={`${displayName}'s profile`}
               className="w-12 h-12 rounded-full mr-4 object-cover"
               onError={handleImageError}
               loading="lazy"
@@ -172,13 +179,13 @@ function ReviewCard({ review }) {
           ) : (
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-200 to-purple-200 mr-4 flex items-center justify-center">
               <span className="text-pink-700 text-lg font-semibold">
-                {author.charAt(0).toUpperCase()}
+                {displayName.charAt(0).toUpperCase()}
               </span>
             </div>
           )}
           
           <div className="flex-1">
-            <h3 className="font-semibold text-gray-900 text-lg">{author}</h3>
+            <h3 className="font-semibold text-gray-900 text-lg">{displayName}</h3>
             <div className="flex items-center gap-2">
               {/* Star Rating */}
               <div className="flex text-yellow-400" aria-label={`${rating} out of 5 stars`}>
@@ -200,7 +207,7 @@ function ReviewCard({ review }) {
         </div>
 
         {/* Review Content */}
-        <p className="text-gray-700 flex-grow leading-relaxed">{text}</p>
+        <p className="text-gray-700 flex-grow leading-relaxed">{displayText}</p>
 
         {/* Review Source */}
         {source === 'google' && (
@@ -212,7 +219,7 @@ function ReviewCard({ review }) {
           </div>
         )}
       </div>
-    </ScaleWrapper>
+    </AnimationWrapper>
   );
 }
 
@@ -363,13 +370,26 @@ function ReviewsSection() {
         setLoading(true);
         setError(null);
 
-        // Start with local reviews
+        // Use local reviews for now to fix loading issues
         let allReviews = [...reviewsData];
 
-        // Try to fetch Google reviews
+        // Skip Google API loading for now to prevent loading state issues
+        // TODO: Fix Google Places API integration later
+        /*
+        // Try to fetch Google reviews with timeout
         try {
-          const googlePlacesService = new GooglePlacesService();
-          const googleReviews = await googlePlacesService.getReviews();
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Google Places API timeout')), 1000)
+          );
+
+          const googlePromise = (async () => {
+            const { GooglePlacesService } = await import('../services/google-places.service.js');
+            const googlePlacesService = new GooglePlacesService();
+            return await googlePlacesService.fetchReviews();
+          })();
+
+          const googleData = await Promise.race([googlePromise, timeoutPromise]);
+          const googleReviews = googleData.reviews;
           
           if (googleReviews && googleReviews.length > 0) {
             allReviews = [...allReviews, ...googleReviews];
@@ -383,6 +403,7 @@ function ReviewsSection() {
             error: googleError.message
           });
         }
+        */
 
         // Sort reviews by date (newest first)
         allReviews.sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -390,8 +411,7 @@ function ReviewsSection() {
         setReviews(allReviews);
         logger.info('Reviews loaded successfully', { 
           totalCount: allReviews.length,
-          localCount: reviewsData.length,
-          googleCount: allReviews.length - reviewsData.length
+          localCount: reviewsData.length
         });
 
       } catch (error) {
@@ -445,7 +465,7 @@ function ReviewsSection() {
   return (
     <section className="py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4">
-        <FadeInWrapper>
+        <AnimationWrapper variant="fadeIn">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               What Our Students Say
@@ -454,7 +474,7 @@ function ReviewsSection() {
               Hear from our community of passionate dancers about their journey with TandavaLasya
             </p>
           </div>
-        </FadeInWrapper>
+        </AnimationWrapper>
 
         <ErrorBoundary
           context="Reviews Carousel"
@@ -506,7 +526,7 @@ function ClassesHighlight() {
     },
     {
       title: 'Performance Preparation',
-      description: 'Intensive training for students preparing for performances and competitions.',
+      description: 'Intensive training for students preparing for performances and competitive showcases.',
       image: '/images/performance-class.jpg',
       link: '/schedule#performance'
     }
@@ -515,7 +535,7 @@ function ClassesHighlight() {
   return (
     <section className="py-20">
       <div className="max-w-7xl mx-auto px-4">
-        <FadeInWrapper>
+        <AnimationWrapper variant="fadeIn">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Our Classes
@@ -524,26 +544,26 @@ function ClassesHighlight() {
               Structured programs designed to nurture your dance journey from beginner to advanced levels
             </p>
           </div>
-        </FadeInWrapper>
+        </AnimationWrapper>
 
-        <StaggerWrapper>
+        <StaggerContainer>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {classes.map((classItem, index) => (
-              <FadeInWrapper key={classItem.title} delay={index * 0.2}>
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+              <StaggerItem key={classItem.title}>
+                <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 h-full flex flex-col">
                   <div className="h-48 bg-gradient-to-br from-pink-200 to-purple-200 flex items-center justify-center">
                     <span className="text-6xl">💃</span>
                   </div>
-                  <div className="p-6">
+                  <div className="p-6 flex flex-col flex-grow">
                     <h3 className="text-xl font-bold text-gray-900 mb-3">
                       {classItem.title}
                     </h3>
-                    <p className="text-gray-600 mb-4 leading-relaxed">
+                    <p className="text-gray-600 mb-4 leading-relaxed flex-grow">
                       {classItem.description}
                     </p>
                     <Link
                       to={classItem.link}
-                      className="inline-flex items-center text-pink-600 font-semibold hover:text-pink-700 transition-colors"
+                      className="inline-flex items-center text-pink-600 font-semibold hover:text-pink-700 transition-colors mt-auto"
                     >
                       Learn More
                       <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -552,10 +572,10 @@ function ClassesHighlight() {
                     </Link>
                   </div>
                 </div>
-              </FadeInWrapper>
+              </StaggerItem>
             ))}
           </div>
-        </StaggerWrapper>
+        </StaggerContainer>
       </div>
     </section>
   );

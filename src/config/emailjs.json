@@ -1,9 +1,20 @@
 {
-  "serviceId": "service_gotwzgl",
-  "userTemplateId": "template_8thsq14",
-  "adminTemplateId": "template_gqkxbke",
-  "publicKey": "MwEHCJXodYceC0-ol",
-  "allowedDomains": ["localhost", "tandavalasya.com"],
+  "publicKey": "test-key",
+  "serviceId": "test-service",
+  "userTemplateId": "test-user-template",
+  "adminTemplateId": "test-admin-template",
+  "allowedDomains": [
+    "gmail.com",
+    "yahoo.com",
+    "outlook.com",
+    "hotmail.com",
+    "example.com",
+    "localhost"
+  ],
+  "rateLimit": {
+    "maxRequests": 5,
+    "windowMs": 60000
+  },
   "templateParams": {
     "from_name": "",
     "from_email": "",

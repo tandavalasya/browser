@@ -290,7 +290,7 @@ export class EmailService extends BaseService {
 
     // Send user acknowledgment email
     try {
-      await this.retryOperation(async () => {
+      await errorHandler.handleWithRetry(async () => {
         if (this.config.publicKey === 'test-key') {
           // Simulate email send in test mode
           logger.info('Simulating user email send (test mode)');
@@ -302,7 +302,7 @@ export class EmailService extends BaseService {
             templateParams
           );
         }
-      }, maxRetries);
+      }, maxRetries, 1000, 'User acknowledgment email');
       
       results.userEmail.success = true;
       logger.debug('User acknowledgment email sent successfully');
@@ -314,7 +314,7 @@ export class EmailService extends BaseService {
 
     // Send admin notification email
     try {
-      await this.retryOperation(async () => {
+      await errorHandler.handleWithRetry(async () => {
         if (this.config.publicKey === 'test-key') {
           // Simulate email send in test mode
           logger.info('Simulating admin email send (test mode)');
@@ -326,7 +326,7 @@ export class EmailService extends BaseService {
             templateParams
           );
         }
-      }, maxRetries);
+      }, maxRetries, 1000, 'Admin notification email');
       
       results.adminEmail.success = true;
       logger.debug('Admin notification email sent successfully');

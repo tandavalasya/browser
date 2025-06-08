@@ -72,6 +72,7 @@ const FloatingElement = ({
 
 /**
  * Dancer Background Image Component
+ * Responsive design: visible on all screen sizes with different positioning
  */
 const DancerBackground = () => {
   const imgUrl = 'https://www.tandavalasya.com/static/b6c8c7fa13bb61de3cf6a6c3448d4535/bfa06/0072.webp';
@@ -80,7 +81,11 @@ const DancerBackground = () => {
     <img
       src={imgUrl}
       alt="Bharatanatyam dancer pose"
-      className="hidden md:block fixed right-[-10vw] top-0 h-full w-auto z-10 opacity-25 pointer-events-none mix-blend-multiply grayscale contrast-125 blur-[1px] object-cover"
+      className="fixed z-10 opacity-20 md:opacity-25 pointer-events-none mix-blend-multiply grayscale contrast-125 blur-[1px] object-cover 
+                 right-[-15vw] top-0 h-full w-auto 
+                 sm:right-[-12vw] 
+                 md:right-[-10vw] 
+                 lg:right-[-8vw]"
       style={{
         filter: 'grayscale(1) contrast(1.2) brightness(1.1) blur(1px)',
         WebkitMaskImage: 'radial-gradient(ellipse 60% 80% at 60% 50%, white 80%, transparent 100%)',

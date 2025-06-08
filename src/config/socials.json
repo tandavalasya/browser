@@ -1,4 +1,12 @@
-{
-  "instagram": "tandavalasya_",
-  "youtube": "@tandavalasyadance"
-} 
+[
+  {
+    "name": "Instagram",
+    "url": "https://instagram.com/tandavalasya_",
+    "icon": "📷"
+  },
+  {
+    "name": "YouTube",
+    "url": "https://youtube.com/@tandavalasyadance",
+    "icon": "📺"
+  }
+] 

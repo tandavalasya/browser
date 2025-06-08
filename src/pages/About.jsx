@@ -109,28 +109,28 @@ function MissionVisionSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           <AnimationWrapper variant="fadeIn" motionProps={{ transition: { delay: 0.2 } }}>
-            <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300">
+            <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300 h-full flex flex-col">
               <div className="flex items-center mb-6">
                 <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full flex items-center justify-center mr-4">
                   <span className="text-white text-2xl">🎯</span>
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900">Mission</h3>
               </div>
-              <p className="text-gray-700 leading-relaxed text-lg">
+              <p className="text-gray-700 leading-relaxed text-lg flex-grow">
                 {content.mission}
               </p>
             </div>
           </AnimationWrapper>
 
           <AnimationWrapper variant="fadeIn" motionProps={{ transition: { delay: 0.4 } }}>
-            <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300">
+            <div className="bg-white rounded-xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300 h-full flex flex-col">
               <div className="flex items-center mb-6">
                 <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-pink-600 rounded-full flex items-center justify-center mr-4">
                   <span className="text-white text-2xl">🌟</span>
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900">Vision</h3>
               </div>
-              <p className="text-gray-700 leading-relaxed text-lg">
+              <p className="text-gray-700 leading-relaxed text-lg flex-grow">
                 {content.vision}
               </p>
             </div>

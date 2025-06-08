@@ -4,20 +4,63 @@
     "name": "Priya S.",
     "image": "/student1.png",
     "rating": 5,
-    "review": "TandavaLasya has transformed my daughter's confidence and grace. Highly recommended!"
+    "review": "TandavaLasya has transformed my daughter's confidence and grace. Highly recommended!",
+    "date": "2024-03-15"
   },
   {
     "id": "review2",
     "name": "Anil K.",
     "image": "",
     "rating": 5,
-    "review": "The teachers are patient and inspiring. My son loves every class!"
+    "review": "The teachers are patient and inspiring. My son loves every class!",
+    "date": "2024-03-10"
   },
   {
     "id": "review3",
     "name": "Meera R.",
     "image": "/student3.png",
     "rating": 4,
-    "review": "A wonderful school with a warm, welcoming environment."
+    "review": "A wonderful school with a warm, welcoming environment.",
+    "date": "2024-03-05"
+  },
+  {
+    "id": "review4",
+    "name": "Rajesh P.",
+    "image": "",
+    "rating": 5,
+    "review": "Exceptional training in classical Bharatanatyam. My daughter has learned so much about both technique and tradition.",
+    "date": "2024-02-28"
+  },
+  {
+    "id": "review5",
+    "name": "Kavitha M.",
+    "image": "",
+    "rating": 5,
+    "review": "The attention to detail in teaching is remarkable. Bhargavi's expertise really shows in every lesson.",
+    "date": "2024-02-20"
+  },
+  {
+    "id": "review6",
+    "name": "Deepak V.",
+    "image": "",
+    "rating": 4,
+    "review": "Great place to learn authentic Bharatanatyam. The atmosphere is encouraging and professional.",
+    "date": "2024-02-15"
+  },
+  {
+    "id": "review7",
+    "name": "Sunita L.",
+    "image": "",
+    "rating": 5,
+    "review": "My daughter has gained so much confidence and poise through these classes. Truly transformative!",
+    "date": "2024-02-10"
+  },
+  {
+    "id": "review8",
+    "name": "Vikram N.",
+    "image": "",
+    "rating": 5,
+    "review": "The cultural education along with dance training makes this school unique. Highly recommend!",
+    "date": "2024-02-05"
   }
 ] 
