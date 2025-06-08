@@ -10,6 +10,7 @@ import { BaseService } from '../core/services/base.service.js';
 import { logger } from '../core/utils/logger.util.js';
 import { errorHandler, NetworkError, ApiError } from '../core/utils/error-handler.util.js';
 import { APP_CONSTANTS } from '../core/constants/app.constants.js';
+import googlePlacesConfig from '../config/googlePlaces.json';
 
 /**
  * Google Places API Configuration
@@ -74,9 +75,18 @@ export class DefaultGooglePlacesApiLoader extends GooglePlacesApiLoader {
         return;
       }
 
-      // Load the script
+      // Load the script with API key from config
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_GOOGLE_PLACES_API_KEY}&libraries=places`;
+      // Use imported config, fallback to environment variable
+      const apiKey = googlePlacesConfig.apiKey || 
+        (typeof process !== 'undefined' && process.env ? process.env.REACT_APP_GOOGLE_PLACES_API_KEY : null);
+      
+      if (!apiKey) {
+        reject(new Error('Google Places API key not configured'));
+        return;
+      }
+      
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
       script.async = true;
       script.defer = true;
 
@@ -104,28 +114,73 @@ export class DefaultGooglePlacesApiLoader extends GooglePlacesApiLoader {
 export class ReviewDataTransformer {
   transform(googleReviewsData) {
     if (!googleReviewsData) {
+      logger.warn('No Google reviews data provided');
       return this._createEmptyReviewsData();
     }
 
     const { reviews = [], rating = 0, user_ratings_total = 0 } = googleReviewsData;
+    
+    logger.debug('Transforming Google reviews data', {
+      reviewCount: reviews.length,
+      sampleReview: reviews[0] ? {
+        hasAuthorName: !!reviews[0].author_name,
+        authorName: reviews[0].author_name,
+        hasText: !!reviews[0].text,
+        hasRating: !!reviews[0].rating,
+        hasTime: !!reviews[0].time
+      } : null
+    });
 
+    const transformedReviews = reviews.map((review, index) => this._transformReview(review, index));
+    
     return {
-      reviews: reviews.map((review, index) => this._transformReview(review, index)),
+      reviews: transformedReviews,
       rating,
       totalReviews: user_ratings_total || reviews.length
     };
   }
 
   _transformReview(review, index) {
+    // Handle Google's anonymized user names more gracefully
+    const authorName = review.author_name || 'Google User';
+    const displayName = this._createMeaningfulDisplayName(authorName, index);
+    
     return {
       id: this._generateReviewId(review, index),
       source: APP_CONSTANTS.REVIEWS.SOURCES.GOOGLE,
-      author: review.author_name || 'Google User',
+      name: displayName,
+      author: displayName, // Fallback for compatibility
       rating: review.rating || 5,
-      text: review.text || '',
+      review: review.text || '',
+      text: review.text || '', // Fallback for compatibility  
       date: review.time ? new Date(review.time * 1000).toISOString() : new Date().toISOString(),
-      profilePhoto: review.profile_photo_url || null
+      image: review.profile_photo_url || null,
+      profilePhoto: review.profile_photo_url || null // Fallback for compatibility
     };
+  }
+
+  _createMeaningfulDisplayName(authorName, index) {
+    // If Google provides a real name, use it
+    if (authorName && 
+        authorName !== 'A Google User' && 
+        authorName !== 'Google User' && 
+        !authorName.startsWith('A Google User')) {
+      return authorName;
+    }
+    
+    // For anonymized users, create meaningful but privacy-respecting names
+    const anonymousNames = [
+      'Dance Enthusiast',
+      'Bharatanatyam Student', 
+      'Classical Dance Lover',
+      'Cultural Arts Appreciator',
+      'Traditional Dance Student',
+      'Performance Art Student',
+      'Indian Classical Dancer',
+      'Dance Academy Student'
+    ];
+    
+    return anonymousNames[index % anonymousNames.length];
   }
 
   _generateReviewId(review, index) {
@@ -168,7 +223,11 @@ export class GooglePlacesService extends BaseService {
    */
   async fetchReviews() {
     const context = 'GooglePlacesService.fetchReviews';
-    logger.info('Fetching Google reviews');
+    logger.info('Fetching Google reviews', {
+      configLoaded: !!this.config,
+      placeId: this.config?.placeId,
+      apiKey: this.config?.apiKey ? 'CONFIGURED' : 'MISSING'
+    });
 
     try {
       // Validate configuration
@@ -192,6 +251,11 @@ export class GooglePlacesService extends BaseService {
       return transformedData;
 
     } catch (error) {
+      logger.error('Google Places service error', {
+        message: error.message,
+        stack: error.stack,
+        config: this.config
+      });
       const handledError = errorHandler.handle(error, context);
       throw new ApiError(handledError.message, null, error);
     } finally {
@@ -291,21 +355,23 @@ export class GooglePlacesService extends BaseService {
   }
 
   /**
-   * Load configuration from environment or defaults
+   * Load configuration from imported config or environment defaults
    * @private
    */
   _loadConfig() {
-    try {
-      // Try to load from config file
-      const config = require('../config/googlePlaces.json');
-      return config;
-    } catch (error) {
-      // Fallback to environment variables
+    // Use imported config, fallback to environment variables
+    if (googlePlacesConfig && googlePlacesConfig.placeId) {
       return {
-        placeId: process.env.REACT_APP_GOOGLE_PLACE_ID,
-        fields: GOOGLE_PLACES_CONFIG.SUPPORTED_FIELDS
+        ...googlePlacesConfig,
+        fields: googlePlacesConfig.fields || GOOGLE_PLACES_CONFIG.SUPPORTED_FIELDS
       };
     }
+    
+    // Fallback to environment variables
+    return {
+      placeId: typeof process !== 'undefined' && process.env ? process.env.REACT_APP_GOOGLE_PLACE_ID : null,
+      fields: GOOGLE_PLACES_CONFIG.SUPPORTED_FIELDS
+    };
   }
 
   /**

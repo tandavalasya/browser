@@ -370,16 +370,13 @@ function ReviewsSection() {
         setLoading(true);
         setError(null);
 
-        // Use local reviews for now to fix loading issues
+        // Start with local reviews as fallback
         let allReviews = [...reviewsData];
 
-        // Skip Google API loading for now to prevent loading state issues
-        // TODO: Fix Google Places API integration later
-        /*
-        // Try to fetch Google reviews with timeout
+        // Try to fetch Google reviews with increased timeout
         try {
           const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Google Places API timeout')), 1000)
+            setTimeout(() => reject(new Error('Google Places API timeout')), 5000)
           );
 
           const googlePromise = (async () => {
@@ -389,21 +386,42 @@ function ReviewsSection() {
           })();
 
           const googleData = await Promise.race([googlePromise, timeoutPromise]);
-          const googleReviews = googleData.reviews;
           
-          if (googleReviews && googleReviews.length > 0) {
-            allReviews = [...allReviews, ...googleReviews];
+          if (googleData && googleData.reviews && googleData.reviews.length > 0) {
+            // Add Google reviews to the beginning (most recent)
+            allReviews = [...googleData.reviews, ...allReviews];
             logger.info('Successfully loaded Google reviews', { 
-              count: googleReviews.length 
+              count: googleData.reviews.length,
+              totalCount: allReviews.length,
+              sampleGoogleReview: googleData.reviews[0] ? {
+                name: googleData.reviews[0].name,
+                author: googleData.reviews[0].author,
+                review: googleData.reviews[0].review,
+                text: googleData.reviews[0].text,
+                rating: googleData.reviews[0].rating,
+                source: googleData.reviews[0].source
+              } : null
             });
+            
+            // Debug: Log all reviewer names to console
+            console.log('Google reviews data:', googleData.reviews.map(r => ({
+              name: r.name,
+              author: r.author,
+              hasName: !!r.name,
+              hasAuthor: !!r.author,
+              actualName: r.name || r.author,
+              source: r.source
+            })));
+          } else {
+            logger.info('No Google reviews found, using local reviews only');
           }
         } catch (googleError) {
           // Log but don't fail - graceful degradation
           logger.warn('Failed to load Google reviews, using local reviews only', {
-            error: googleError.message
+            error: googleError.message,
+            stack: googleError.stack
           });
         }
-        */
 
         // Sort reviews by date (newest first)
         allReviews.sort((a, b) => new Date(b.date) - new Date(a.date));
