@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useState, useRef } from 'react';
+import { motion, useAnimation } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
 const containerVariants = {
@@ -12,101 +12,162 @@ const containerVariants = {
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 40 },
+  hidden: { opacity: 0, y: 30 },
   show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 60 } },
+};
+
+const staggeredList = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.18,
+    },
+  },
+};
+
+const staggeredItem = {
+  hidden: { opacity: 0, x: -20 },
+  show: { opacity: 1, x: 0, transition: { type: 'spring', stiffness: 60 } },
 };
 
 const Home = () => {
   const [reviews, setReviews] = useState([]);
+  const carouselRef = useRef(null);
+  const controls = useAnimation();
   useEffect(() => {
     import('../config/reviews.json').then((mod) => setReviews(mod.default || mod));
   }, []);
+  // Auto-scroll logic
+  useEffect(() => {
+    let interval;
+    if (reviews.length > 1) {
+      let index = 0;
+      interval = setInterval(() => {
+        index = (index + 1) % reviews.length;
+        controls.start({ x: -index * 340 });
+      }, 3500);
+    }
+    return () => clearInterval(interval);
+  }, [reviews, controls]);
 
   return (
-    <motion.section
-      className="flex flex-col items-center justify-center py-20 max-w-3xl w-full mx-auto text-center relative"
-      initial="hidden"
-      animate="show"
-      variants={containerVariants}
-    >
-      {/* Animated floating background shape */}
+    <div className="relative flex flex-col items-center justify-center w-full pb-20">
+      {/* Subtle floating background shapes, not covering floating elements */}
+      <div className="absolute -top-24 -left-24 w-80 h-80 bg-pink-100 rounded-full blur-2xl opacity-20 z-0 pointer-events-none" />
+      <div className="absolute -bottom-24 right-0 w-80 h-80 bg-orange-100 rounded-full blur-2xl opacity-20 z-0 pointer-events-none" />
+      {/* Hero Section */}
       <motion.div
-        className="absolute -top-10 -left-10 w-40 h-40 bg-pink-100 rounded-full blur-2xl opacity-40 z-0"
-        animate={{ y: [0, 20, 0], x: [0, 10, 0] }}
-        transition={{ repeat: Infinity, duration: 8, ease: 'easeInOut' }}
-      />
-      <motion.div
-        className="w-24 h-24 rounded-full bg-gradient-to-tr from-white via-pink-50 to-orange-100 flex items-center justify-center mb-4 shadow-xl border border-pink-200 z-10"
-        animate={{ scale: [1, 1.08, 1] }}
-        transition={{ repeat: Infinity, duration: 2 }}
-        variants={itemVariants}
+        className="flex flex-col items-center justify-center pt-24 pb-8 w-full z-10"
+        initial="hidden"
+        animate="show"
+        variants={containerVariants}
       >
-        <img src="/logo.png" alt="TandavaLasya Logo" className="w-24 h-24 object-cover drop-shadow-md" />
-      </motion.div>
-      <motion.h1 className="text-4xl md:text-6xl font-extrabold mb-4 tracking-tight drop-shadow-lg z-10" variants={itemVariants}>
-        TandavaLasya
-      </motion.h1>
-      <motion.h2 className="text-xl md:text-2xl font-semibold mb-6 text-pink-700 z-10" variants={itemVariants}>
-        Bharatanatyam Dance School
-      </motion.h2>
-      {/* Short summary */}
-      <motion.p className="max-w-2xl text-lg md:text-xl mb-6 text-gray-700 z-10" variants={itemVariants}>
-        Welcome to TandavaLasya, where tradition meets innovation. Led by <span className="font-bold text-pink-600">Bhargavi Venkataraman</span>, MFA (Bharatanatyam), Grade B Doordarshan artist, and award-winning performer, our school inspires students of all ages to discover the joy and discipline of Bharatanatyam.
-      </motion.p>
-      {/* Why Choose Us */}
-      <motion.div className="bg-white/80 rounded-xl shadow p-4 flex-1 min-w-[220px] mb-8" variants={itemVariants}>
-        <div className="text-orange-600 font-bold text-lg mb-1">Why Choose Us?</div>
-        <ul className="text-left text-gray-700 text-sm list-disc list-inside">
-          <li>Expert, passionate instructors</li>
-          <li>Blend of tradition and creativity</li>
-          <li>Personalized attention for every student</li>
-          <li>Performances, workshops, and community events</li>
-        </ul>
-      </motion.div>
-      {/* Notable Highlights */}
-      <motion.div className="bg-white/80 rounded-xl shadow p-4 flex-1 min-w-[220px] mb-8" variants={itemVariants}>
-        <div className="text-pink-600 font-bold text-lg mb-1">Notable Highlights</div>
-        <ul className="text-left text-gray-700 text-sm list-disc list-inside">
-          <li>Guinness World Record participant (Largest Bharatanatyam lesson)</li>
-          <li>1000th year celebration, Tanjore Brihadeeswarar Temple</li>
-          <li>Best Performer 2016, Sri Parthasarathy Swami Sabha</li>
-          <li>Major festivals & sabhas across India</li>
-        </ul>
-      </motion.div>
-      {/* Call to Action */}
-      <motion.div className="flex gap-4 justify-center z-10 mb-8" variants={itemVariants}>
-        <motion.div whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.96 }}>
-          <Link to="/about" className="inline-block px-8 py-3 bg-gradient-to-r from-pink-500 to-orange-400 text-white font-bold rounded-full shadow-lg hover:from-orange-400 hover:to-pink-500 transition-transform duration-300">Meet Our Instructors</Link>
+        <motion.div
+          className="w-20 h-20 rounded-full bg-gradient-to-tr from-white via-pink-50 to-orange-100 flex items-center justify-center mb-4 shadow-xl border-2 border-pink-200 z-10"
+          animate={{ scale: [1, 1.08, 1] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+          variants={itemVariants}
+        >
+          <img src="/logo.png" alt="TandavaLasya Logo" className="w-16 h-16 object-cover drop-shadow-md" />
         </motion.div>
-        <motion.div whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.96 }}>
-          <Link to="/gallery" className="inline-block px-8 py-3 bg-white/80 text-pink-600 font-bold rounded-full shadow hover:bg-pink-50 transition-colors duration-300">Explore Gallery</Link>
+        <motion.h1 className="text-3xl md:text-5xl font-extrabold mb-2 tracking-tight drop-shadow-lg z-10 text-pink-700" variants={itemVariants}>
+          TandavaLasya
+        </motion.h1>
+        <motion.h2 className="text-lg md:text-2xl font-semibold mb-4 text-orange-600 z-10" variants={itemVariants}>
+          Bharatanatyam Dance School
+        </motion.h2>
+        <motion.p className="max-w-2xl text-base md:text-lg mb-6 text-gray-700 z-10" variants={itemVariants}>
+          Welcome to TandavaLasya, where tradition meets innovation. Led by <span className="font-bold text-pink-600">Bhargavi Venkataraman</span>, MFA (Bharatanatyam), Grade B Doordarshan artist, and award-winning performer, our school inspires students of all ages to discover the joy and discipline of Bharatanatyam.
+        </motion.p>
+        {/* CTA Buttons */}
+        <motion.div className="flex flex-row gap-4 justify-center z-10 mt-2 mb-2" variants={itemVariants}>
+          <Link to="/about" className="inline-block px-6 py-3 bg-gradient-to-r from-pink-500 to-orange-400 text-white font-bold rounded-full shadow-lg hover:from-orange-400 hover:to-pink-500 transition-transform duration-300 text-base">Meet Our Instructors</Link>
+          <Link to="/gallery" className="inline-block px-6 py-3 bg-white/80 text-pink-600 font-bold rounded-full shadow hover:bg-pink-50 transition-colors duration-300 text-base">Explore Gallery</Link>
         </motion.div>
       </motion.div>
-      {/* Reviews Section */}
-      <motion.div className="w-full max-w-2xl mx-auto mt-8" initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-        <h3 className="text-2xl font-bold text-orange-600 mb-6">What Our Students Say</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* About Bhargavi / School Philosophy */}
+      <motion.div className="w-full max-w-3xl mx-auto flex flex-col items-center mb-10 z-10" initial="hidden" whileInView="show" viewport={{ once: true }} variants={containerVariants}>
+        <motion.h3 className="text-xl md:text-2xl font-bold text-pink-700 mb-2" variants={itemVariants}>Our Mission & Vision</motion.h3>
+        <motion.p className="text-base md:text-lg text-gray-700 mb-4 text-center" variants={itemVariants}>
+          At TandavaLasya, our mission is to nurture a lifelong love for Bharatanatyam by blending tradition with creativity, discipline with joy, and art with holistic well-being. We believe that dance is not just a performance, but a journey of self-discovery, health, and community.
+        </motion.p>
+        <motion.p className="text-base md:text-lg text-gray-700 mb-4 text-center" variants={itemVariants}>
+          Our vision is to create a vibrant, inclusive space where students of all ages and backgrounds can experience the transformative power of Bharatanatyam. We are committed to fostering not only artistic excellence, but also physical fitness, mental resilience, and a deep sense of belonging.
+        </motion.p>
+      </motion.div>
+      {/* Why Choose Us - no box, just staggered points */}
+      <motion.div className="w-full max-w-3xl mx-auto flex flex-col items-center mb-10 z-10">
+        <motion.div className="text-orange-600 font-bold text-lg mb-2">Why Choose Us?</motion.div>
+        <motion.ul className="w-full flex flex-col gap-2" variants={staggeredList} initial="hidden" whileInView="show" viewport={{ once: true }}>
+          {[
+            'Rooted in the rich tradition of Bharatanatyam, with a modern, creative approach',
+            'Holistic focus: dance technique, health, fitness, and flexibility',
+            'Classes include dynamic warm-ups, stretches, and strength-building routines',
+            'Emphasis on discipline, self-expression, and joy in learning',
+            'Supportive, inclusive community for all ages and backgrounds',
+            'Performance opportunities, workshops, and cultural events',
+            'Guidance for personal growth, confidence, and lifelong wellness',
+          ].map((point, idx) => (
+            <motion.li key={point} className="text-base md:text-lg text-gray-700 flex items-center gap-3" variants={staggeredItem}>
+              <span className="inline-block w-3 h-3 rounded-full bg-pink-400 mr-2 animate-pulse" />
+              {point}
+            </motion.li>
+          ))}
+        </motion.ul>
+      </motion.div>
+      {/* School Tenets & Philosophy */}
+      <motion.div className="w-full max-w-3xl mx-auto flex flex-col items-center mb-10 z-10" initial="hidden" whileInView="show" viewport={{ once: true }} variants={containerVariants}>
+        <motion.h3 className="text-xl md:text-2xl font-bold text-orange-700 mb-2" variants={itemVariants}>Our Tenets</motion.h3>
+        <motion.ul className="text-base md:text-lg text-gray-700 mb-2 text-center list-disc list-inside" variants={itemVariants}>
+          <li>Respect for the ancient art of Bharatanatyam, honoring its history and spiritual roots</li>
+          <li>Encouraging curiosity, creativity, and innovation in every student</li>
+          <li>Promoting physical health through structured warm-ups, mindful stretching, and safe technique</li>
+          <li>Building mental resilience, focus, and confidence through disciplined practice</li>
+          <li>Fostering a sense of community, empathy, and cultural appreciation</li>
+          <li>Celebrating each dancer's unique journey and growth</li>
+        </motion.ul>
+      </motion.div>
+      {/* Reviews Carousel - floating above a soft background */}
+      <motion.div className="w-full max-w-3xl mx-auto mt-8 mb-16 relative z-20 overflow-x-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-50 via-pink-50 to-white rounded-3xl blur-md opacity-60 -z-10" />
+        <h3 className="text-lg md:text-xl font-bold text-orange-600 mb-4 text-center">What Our Students Say</h3>
+        <motion.div
+          ref={carouselRef}
+          className="flex gap-8 px-2"
+          animate={controls}
+          transition={{ type: 'spring', stiffness: 40, damping: 20 }}
+          style={{ willChange: 'transform' }}
+        >
           {reviews.map((review, i) => (
             <motion.div
               key={review.id}
-              className="bg-white rounded-xl shadow p-5 flex flex-col items-center text-center hover:shadow-lg transition-all duration-300"
+              className="bg-white rounded-2xl shadow-xl p-6 flex flex-col items-center text-center min-w-[300px] max-w-[300px] mx-auto relative hover:scale-105 transition-transform duration-300"
+              whileHover={{ scale: 1.08 }}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 * i, duration: 0.5 }}
+              transition={{ delay: 0.1 * i, duration: 0.7 }}
             >
-              {review.image && <img src={review.image} alt={review.name} className="w-14 h-14 rounded-full object-cover mb-2 border-2 border-pink-200" />}
-              <div className="font-semibold text-pink-700 mb-1">{review.name}</div>
+              {review.image && <img src={review.image} alt={review.name} className="w-14 h-14 rounded-full object-cover mb-2 border-2 border-pink-200 shadow" />}
+              <div className="font-semibold text-pink-700 mb-1 text-base">{review.name}</div>
               <div className="flex items-center justify-center mb-2">
                 {[...Array(5)].map((_, idx) => (
                   <span key={idx} className={idx < review.rating ? 'text-yellow-400 text-lg' : 'text-gray-300 text-lg'}>★</span>
                 ))}
               </div>
-              <div className="text-gray-700 text-sm">{review.review}</div>
+              <div className="text-gray-700 text-base leading-relaxed">{review.review}</div>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </motion.div>
-    </motion.section>
+      {/* Call to Action */}
+      <motion.div className="w-full max-w-3xl mx-auto flex flex-col items-center mb-8 z-10" initial="hidden" whileInView="show" viewport={{ once: true }} variants={containerVariants}>
+        <motion.h3 className="text-lg md:text-xl font-bold text-pink-700 mb-2" variants={itemVariants}>Join Us</motion.h3>
+        <motion.p className="text-base md:text-lg text-gray-700 mb-4 text-center" variants={itemVariants}>
+          Whether you are a beginner or an experienced dancer, TandavaLasya welcomes you to join our vibrant community. Experience the grace, tradition, and joy of Bharatanatyam in a supportive and inspiring environment.
+        </motion.p>
+        <Link to="/contact" className="inline-block px-6 py-3 bg-gradient-to-r from-pink-500 to-orange-400 text-white font-bold rounded-full shadow-lg hover:from-orange-400 hover:to-pink-500 transition-transform duration-300 text-base">Get Started</Link>
+      </motion.div>
+    </div>
   );
 };
 
