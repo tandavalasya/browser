@@ -3,7 +3,7 @@ import { loadGooglePlacesApi } from '../utils/googlePlacesLoader';
 import googlePlacesConfig from '../config/googlePlaces.json';
 
 // Supported fields for Places API
-const SUPPORTED_FIELDS = ['reviews', 'rating', 'formatted_address'];
+const SUPPORTED_FIELDS = ['reviews', 'rating', 'address'];
 
 export async function fetchPlaceReviews() {
   let map = null;
@@ -32,37 +32,41 @@ export async function fetchPlaceReviews() {
       keyboardShortcuts: false
     });
 
-    // Create Places Service
-    const service = new google.maps.places.PlacesService(map);
+    // Create a Place instance using the new API
+    const place = new google.maps.places.Place({
+      id: googlePlacesConfig.placeId,
+      map: map
+    });
 
-    // Create request object
-    const request = {
-      placeId: googlePlacesConfig.placeId,
+    // Fetch place details using the new API
+    const result = await place.fetchFields({
       fields: googlePlacesConfig.fields
+    });
+
+    if (!result.reviews || !result.reviews.length) {
+      console.log('No reviews found for place:', result);
+      return {
+        reviews: [],
+        rating: result.rating || 0,
+        address: result.address || ''
+      };
+    }
+
+    // Transform reviews to match our format
+    const reviews = result.reviews.map(review => ({
+      author: review.authorName || review.author_name,
+      rating: review.rating,
+      text: review.text,
+      time: review.time || review.publishTime,
+      source: 'Google'
+    }));
+
+    return {
+      reviews,
+      rating: result.rating || 0,
+      address: result.address || ''
     };
 
-    return new Promise((resolve, reject) => {
-      service.getDetails(request, (place, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && place) {
-          // Transform reviews to match our format
-          const reviews = (place.reviews || []).map(review => ({
-            author: review.author_name,
-            rating: review.rating,
-            text: review.text,
-            time: review.time,
-            source: 'Google'
-          }));
-
-          resolve({
-            reviews,
-            rating: place.rating,
-            address: place.formatted_address
-          });
-        } else {
-          reject(new Error(`Places service error: ${status}`));
-        }
-      });
-    });
   } catch (error) {
     console.error('Error fetching place reviews:', error);
     console.error('Error details:', error.message);
