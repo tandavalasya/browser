@@ -2,19 +2,12 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useGoogleSheetCSV } from '../utils/useGoogleSheetCSV';
+import config from '../../../config/tandavalasya.config.json';
 
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRmYOSXn1a6VJb3VLG2hvYrnSAyZaLB8OyGOfcR4Cm-8HPwOGy8rQ-C_Rf1y4b4_LbCelC_MydXpYQx/pub?gid=0&single=true&output=csv';
 
-const classColors = {
-  'Intermediate Kids': 'bg-orange-200 text-orange-800',
-  'Beginner Adult': 'bg-blue-200 text-blue-800',
-  'Advanced Adult': 'bg-green-200 text-green-800',
-  'Beginner Kids': 'bg-pink-200 text-pink-800',
-  'Reserved for Private Classes': 'bg-gray-200 text-gray-700',
-};
-
 function getCellClass(value) {
-  return classColors[value] || '';
+  return config.classColors[value] || '';
 }
 
 const containerVariants = {
@@ -31,27 +24,24 @@ const itemVariants = {
   show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 60 } },
 };
 
-// Improved merged cell logic for consecutive identical values (rowSpan)
-function calculateRowSpans(rows, headers) {
+// Each class cell spans 2 rows (1 hour). For empty slots, only allow clicking on the first of each pair.
+function calculateRowSpansHour(rows, headers) {
   const rowSpans = Array.from({ length: rows.length }, () => ({}));
   for (let col = 0; col < headers.length; col++) {
-    if (col === 1) continue; // Don't merge the time slot column
-    let prev = null;
-    let start = 0;
-    for (let row = 0; row <= rows.length; row++) {
-      const value = row < rows.length ? rows[row][headers[col]] : null;
-      if (value !== prev) {
-        if (prev !== null && prev !== '') {
-          const span = row - start;
-          if (span > 1) {
-            rowSpans[start][headers[col]] = span;
-            for (let k = start + 1; k < row; k++) {
-              rowSpans[k][headers[col]] = 0; // Mark as skip
-            }
-          }
+    if (col === 0 || col === 1) continue; // Don't merge the index or time slot column
+    for (let row = 0; row < rows.length; row++) {
+      const value = rows[row][headers[col]] || '';
+      if (value !== '') {
+        // Only render for even rows (first of each hour)
+        if (row % 2 === 0) {
+          rowSpans[row][headers[col]] = 2;
+          rowSpans[row + 1] && (rowSpans[row + 1][headers[col]] = 0);
+        } else if (rowSpans[row][headers[col]] === undefined) {
+          rowSpans[row][headers[col]] = 0;
         }
-        prev = value;
-        start = row;
+      } else {
+        // For empty slots, no rowSpan, but only allow click on first of each pair
+        rowSpans[row][headers[col]] = 1;
       }
     }
   }
@@ -62,13 +52,24 @@ const Schedule = () => {
   const { data, loading, error } = useGoogleSheetCSV(CSV_URL);
   const headers = data && data.length > 0 ? Object.keys(data[0]) : [];
   const rows = data;
-  const rowSpans = calculateRowSpans(rows, headers);
+  const rowSpans = calculateRowSpansHour(rows, headers);
   const navigate = useNavigate();
 
-  // Handler for empty slot click (to be implemented in next step)
-  const handleEmptySlotClick = (day, time) => {
-    // Placeholder for now
-    // navigate(`/contact?slot=${encodeURIComponent(`${day} at ${time}`)}`);
+  // Find the header for the time slot column (case-insensitive)
+  const timeHeader = headers.find(h => h.toLowerCase().includes('time')) || headers[1];
+
+  const handleEmptySlotClick = (day, rowIdx) => {
+    const startTime = rows[rowIdx]?.[timeHeader] || '';
+    const endTime = rows[rowIdx + 1]?.[timeHeader] || '';
+    let msg = '';
+    if (startTime && endTime) {
+      msg = `I'd like to reserve recurring classes on ${day} between ${startTime} and ${endTime}.`;
+    } else if (startTime) {
+      msg = `I'd like to reserve recurring classes on ${day} at ${startTime}.`;
+    } else {
+      msg = `I'd like to reserve recurring classes on ${day}.`;
+    }
+    navigate(`/contact?message=${encodeURIComponent(msg)}`);
   };
 
   return (
@@ -86,7 +87,7 @@ const Schedule = () => {
       </motion.h2>
       {/* Legend */}
       <motion.div className="flex flex-wrap gap-4 mb-6 justify-center" variants={itemVariants}>
-        {Object.entries(classColors).map(([label, colorClass]) => (
+        {Object.entries(config.classColors).map(([label, colorClass]) => (
           <span key={label} className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold ${colorClass}`}>
             <span className="w-3 h-3 rounded-full inline-block" style={{ background: colorClass.split(' ')[0].replace('bg-', '').replace('-', '#') }}></span>
             {label}
@@ -114,16 +115,30 @@ const Schedule = () => {
                     const value = row[header] || '';
                     const span = rowSpans[i][header] === undefined ? 1 : rowSpans[i][header];
                     if (span === 0) return null; // skip cell, it's merged
-                    // For empty slots, make cell clickable (prepare for next step)
+                    // For empty slots, only allow click on first of each pair (even rows)
                     const isEmpty = value === '';
+                    const isFirstOfPair = i % 2 === 0;
+                    if (isEmpty && isFirstOfPair && j > 1) {
+                      return (
+                        <td
+                          key={j}
+                          rowSpan={span}
+                          className={`px-2 py-2 align-middle text-center border border-orange-200 whitespace-pre-line break-words transition-all duration-300 cursor-pointer hover:bg-orange-50`}
+                          style={{ minWidth: 100, maxWidth: 180, wordBreak: 'break-word' }}
+                          onClick={() => handleEmptySlotClick(headers[j], i)}
+                          title={`Click to reserve recurring classes on ${headers[j]} between ${row[timeHeader] || ''} and ${rows[i + 1]?.[timeHeader] || ''}`}
+                        >
+                          {value}
+                        </td>
+                      );
+                    }
                     return (
                       <td
                         key={j}
                         rowSpan={span}
-                        className={`px-2 py-2 align-middle text-center border border-orange-200 whitespace-pre-line break-words transition-all duration-300 ${getCellClass(value)} ${isEmpty ? 'cursor-pointer hover:bg-orange-50' : ''}`}
+                        className={`px-2 py-2 align-middle text-center border border-orange-200 whitespace-pre-line break-words transition-all duration-300 ${getCellClass(value)}`}
                         style={{ minWidth: 100, maxWidth: 180, wordBreak: 'break-word' }}
-                        onClick={isEmpty && j !== 0 && j !== 1 ? () => handleEmptySlotClick(headers[j], row[headers[1]]) : undefined}
-                        title={isEmpty ? `Click to reserve ${headers[j]} at ${row[headers[1]]}` : value}
+                        title={value}
                       >
                         {value}
                       </td>

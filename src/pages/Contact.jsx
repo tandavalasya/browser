@@ -1,6 +1,8 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 import emailjs from 'emailjs-com';
+import config from '../../../config/tandavalasya.config.json';
 
 const SERVICE_ID = 'your_service_id'; // TODO: Replace with your EmailJS service ID
 const TEMPLATE_ID = 'your_template_id'; // TODO: Replace with your EmailJS template ID
@@ -20,10 +22,23 @@ const itemVariants = {
   show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 60 } },
 };
 
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
+
 const Contact = () => {
-  const [form, setForm] = useState({ name: '', email: '', message: '' });
+  const query = useQuery();
+  const prefillMessage = query.get('message') || '';
+  const [form, setForm] = useState({ name: '', email: '', message: '', location: '' });
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Pre-fill message if present
+  useEffect(() => {
+    if (prefillMessage) {
+      setForm((f) => ({ ...f, message: prefillMessage }));
+    }
+  }, [prefillMessage]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -34,13 +49,19 @@ const Contact = () => {
     setLoading(true);
     setStatus('');
     try {
-      await emailjs.send(SERVICE_ID, TEMPLATE_ID, {
-        from_name: form.name,
-        from_email: form.email,
-        message: form.message,
-      }, USER_ID);
+      await emailjs.send(
+        SERVICE_ID,
+        TEMPLATE_ID,
+        {
+          from_name: form.name,
+          from_email: form.email,
+          message: form.message,
+          location: form.location,
+        },
+        USER_ID
+      );
       setStatus('success');
-      setForm({ name: '', email: '', message: '' });
+      setForm({ name: '', email: '', message: '', location: '' });
     } catch (err) {
       setStatus('error');
     } finally {
@@ -69,6 +90,15 @@ const Contact = () => {
         <motion.input name="name" type="text" placeholder="Your Name" value={form.name} onChange={handleChange} className="px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400" required variants={itemVariants} />
         <motion.input name="email" type="email" placeholder="Your Email" value={form.email} onChange={handleChange} className="px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400" required variants={itemVariants} />
         <motion.textarea name="message" placeholder="Your Message" rows={4} value={form.message} onChange={handleChange} className="px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400" required variants={itemVariants} />
+        <div className="flex flex-col gap-2">
+          <label className="font-semibold text-gray-700">Location <span className="text-pink-500">*</span></label>
+          <select name="location" value={form.location} onChange={handleChange} required className="px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400">
+            <option value="">Select...</option>
+            {config.locations.map(loc => (
+              <option key={loc} value={loc}>{loc}</option>
+            ))}
+          </select>
+        </div>
         <motion.button
           type="submit"
           className="px-6 py-2 bg-pink-500 text-white rounded-full font-semibold hover:bg-pink-600 transition-colors"
