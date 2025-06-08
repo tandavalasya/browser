@@ -82,25 +82,15 @@ const Home = () => {
           </motion.p>
           {/* CTA Buttons */}
           <motion.div className="flex flex-row gap-4 z-10 mt-2 mb-2 justify-center md:justify-start" variants={itemVariants}>
-            <Link to="/about" className="inline-block px-6 py-3 bg-gradient-to-r from-pink-500 to-orange-400 text-white font-bold rounded-full shadow-lg hover:from-orange-400 hover:to-pink-500 transition-transform duration-300 text-base">Meet Our Instructors</Link>
+            <Link to="/about" className="inline-block px-6 py-3 bg-gradient-to-r from-pink-500 to-orange-400 text-white font-bold rounded-full shadow-lg hover:from-orange-400 hover:to-pink-500 transition-transform duration-300 text-base">Learn More About Us</Link>
             <Link to="/gallery" className="inline-block px-6 py-3 bg-white/80 text-pink-600 font-bold rounded-full shadow hover:bg-pink-50 transition-colors duration-300 text-base">Explore Gallery</Link>
           </motion.div>
         </div>
       </div>
-      {/* About Bhargavi / School Philosophy */}
-      <motion.div className="w-full max-w-3xl mx-auto flex flex-col mb-10 z-10" initial="hidden" whileInView="show" viewport={{ once: true }} variants={containerVariants}>
-        <motion.h3 className="text-xl md:text-2xl font-bold text-pink-700 mb-2 text-left" variants={itemVariants}>Our Mission & Vision</motion.h3>
-        <motion.p className="text-base md:text-lg text-gray-700 mb-4 text-left" variants={itemVariants}>
-          At TandavaLasya, our mission is to nurture a lifelong love for Bharatanatyam by blending tradition with creativity, discipline with joy, and art with holistic well-being. We believe that dance is not just a performance, but a journey of self-discovery, health, and community.
-        </motion.p>
-        <motion.p className="text-base md:text-lg text-gray-700 mb-4 text-left" variants={itemVariants}>
-          Our vision is to create a vibrant, inclusive space where students of all ages and backgrounds can experience the transformative power of Bharatanatyam. We are committed to fostering not only artistic excellence, but also physical fitness, mental resilience, and a deep sense of belonging.
-        </motion.p>
-      </motion.div>
       {/* Why Choose Us - no box, just staggered points */}
-      <motion.div className="w-full max-w-3xl mx-auto flex flex-col mb-10 z-10">
+      <motion.div className="w-full max-w-3xl mx-auto mb-10 z-10">
         <motion.div className="text-orange-600 font-bold text-lg mb-2 text-left">Why Choose Us?</motion.div>
-        <motion.ul className="w-full flex flex-col gap-2 text-left" variants={staggeredList} initial="hidden" whileInView="show" viewport={{ once: true }}>
+        <motion.ul className="w-full flex flex-col gap-3 text-left" variants={staggeredList} initial="hidden" whileInView="show" viewport={{ once: true }}>
           {[
             'Rooted in the rich tradition of Bharatanatyam, with a modern, creative approach',
             'Holistic focus: dance technique, health, fitness, and flexibility',
@@ -110,23 +100,11 @@ const Home = () => {
             'Performance opportunities, workshops, and cultural events',
             'Guidance for personal growth, confidence, and lifelong wellness',
           ].map((point, idx) => (
-            <motion.li key={point} className="text-base md:text-lg text-gray-700 flex items-center gap-3" variants={staggeredItem}>
-              <span className="inline-block w-3 h-3 rounded-full bg-pink-400 mr-2 animate-pulse" />
-              {point}
+            <motion.li key={point} className="text-base md:text-lg text-gray-700 flex items-start gap-3" variants={staggeredItem}>
+              <span className="inline-block w-2 h-2 rounded-full bg-gradient-to-r from-pink-400 to-orange-400 mt-2 flex-shrink-0 animate-pulse" />
+              <span>{point}</span>
             </motion.li>
           ))}
-        </motion.ul>
-      </motion.div>
-      {/* School Tenets & Philosophy */}
-      <motion.div className="w-full max-w-3xl mx-auto flex flex-col mb-10 z-10" initial="hidden" whileInView="show" viewport={{ once: true }} variants={containerVariants}>
-        <motion.h3 className="text-xl md:text-2xl font-bold text-orange-700 mb-2 text-left" variants={itemVariants}>Our Tenets</motion.h3>
-        <motion.ul className="text-base md:text-lg text-gray-700 mb-2 text-left list-disc list-inside" variants={itemVariants}>
-          <li>Respect for the ancient art of Bharatanatyam, honoring its history and spiritual roots</li>
-          <li>Encouraging curiosity, creativity, and innovation in every student</li>
-          <li>Promoting physical health through structured warm-ups, mindful stretching, and safe technique</li>
-          <li>Building mental resilience, focus, and confidence through disciplined practice</li>
-          <li>Fostering a sense of community, empathy, and cultural appreciation</li>
-          <li>Celebrating each dancer's unique journey and growth</li>
         </motion.ul>
       </motion.div>
       {/* Reviews Carousel - floating above a soft background */}
