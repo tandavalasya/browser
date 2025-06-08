@@ -11,15 +11,15 @@ export const fetchPlaceReviews = async (placeId) => {
       throw new Error('Google Maps API not loaded');
     }
 
-    // Create a Place instance
+    // Create a Place instance with only the fields we need
     const place = new google.maps.places.Place({
       id: placeId,
-      fields: ['reviews', 'rating', 'user_ratings_total']
+      fields: ['reviews', 'rating']  // Removed user_ratings_total as it's not supported
     });
 
-    // Fetch the place details
+    // Fetch the place details with the same fields
     const result = await place.fetchFields({
-      fields: ['reviews', 'rating', 'user_ratings_total']
+      fields: ['reviews', 'rating']
     });
 
     if (!result.reviews || !result.reviews.length) {

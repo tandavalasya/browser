@@ -26,9 +26,9 @@ export const loadGooglePlacesApi = async () => {
         resolve(config);
       };
 
-      // Create and append the script with async loading pattern
+      // Create and append the script with recommended loading pattern
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${config.apiKey}&libraries=places&callback=initGooglePlacesApi`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${config.apiKey}&libraries=places&callback=initGooglePlacesApi&loading=async`;
       script.async = true;
       script.defer = true;
       
