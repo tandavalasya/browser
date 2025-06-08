@@ -11,31 +11,39 @@ export const fetchPlaceReviews = async (placeId) => {
       throw new Error('Google Maps API not loaded');
     }
 
-    // Create a Place instance with only the fields we need
+    // Use the new Places API format
     const place = new google.maps.places.Place({
       id: placeId,
-      fields: ['reviews', 'rating']  // Removed user_ratings_total as it's not supported
+      // The new API uses a different format for fields
+      fields: ['reviews', 'rating', 'name', 'formattedAddress']
     });
 
-    // Fetch the place details with the same fields
-    const result = await place.fetchFields({
-      fields: ['reviews', 'rating']
-    });
+    // Fetch place details using the new API format
+    const result = await place.fetchFields();
 
     if (!result.reviews || !result.reviews.length) {
+      console.log('No reviews found for place:', result);
       return [];
     }
 
     // Transform the reviews to match our format
+    // The new API returns reviews in a slightly different format
     return result.reviews.map(review => ({
-      author: review.author_name,
+      author: review.authorName || review.author_name, // Handle both formats
       rating: review.rating,
       text: review.text,
-      time: review.time,
+      time: review.time || review.publishTime, // Handle both formats
       source: 'Google Business'
     }));
   } catch (error) {
     console.error('Error fetching place reviews:', error);
+    // Log more details about the error
+    if (error.message) {
+      console.error('Error details:', error.message);
+    }
+    if (error.stack) {
+      console.error('Error stack:', error.stack);
+    }
     throw error;
   }
 }; 
