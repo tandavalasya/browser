@@ -7,6 +7,7 @@ This directory contains comprehensive documentation for the TandavaLasya Bharata
 ```
 docs/
 ├── README.md                    # This file - Documentation index
+├── ENVIRONMENT_SETUP.md         # EmailJS and environment configuration guide
 └── requirements/               # Requirements documentation
     ├── businessRequirements.md # Business strategy and objectives
     └── uxRequirements.md       # User experience specifications
@@ -15,6 +16,17 @@ docs/
 ---
 
 ## 📋 **Document Overview**
+
+### **Setup & Configuration**
+
+#### **Environment Setup Guide** (`ENVIRONMENT_SETUP.md`)
+Complete guide for configuring the application:
+- **EmailJS Integration**: Step-by-step setup for contact form functionality
+- **Environment Variables**: Configuration for development and production
+- **Deployment Instructions**: Netlify, Vercel, and other hosting platforms
+- **Email Templates**: Ready-to-use EmailJS templates with styling
+- **Troubleshooting**: Common issues and solutions
+- **Security Best Practices**: Protecting API keys and sensitive data
 
 ### **Requirements Documentation**
 
@@ -41,6 +53,11 @@ Complete user experience strategy covering:
 
 ## 🎯 **Document Purpose & Audience**
 
+### **Environment Setup** - For Developers & Deployment
+- **Primary Audience**: Developers, DevOps, system administrators
+- **Use Cases**: Local development setup, production deployment, troubleshooting
+- **Key Sections**: EmailJS configuration, environment variables, deployment guides
+
 ### **Business Requirements** - For Strategic Planning
 - **Primary Audience**: School leadership, investors, business partners
 - **Use Cases**: Strategic decision making, funding discussions, expansion planning
@@ -56,14 +73,15 @@ Complete user experience strategy covering:
 ## 🔄 **Document Maintenance**
 
 ### **Update Schedule**
-- **Quarterly Reviews**: March, June, September, December
+- **Environment Setup**: Updated as needed for new features and deployment changes
+- **Business/UX Requirements**: Quarterly reviews in March, June, September, December
 - **Version Control**: Semantic versioning (Major.Minor.Patch)
 - **Change Tracking**: Document all significant updates and rationale
 
 ### **Review Process**
-1. **Stakeholder Review**: Business and technical team input
-2. **Cultural Authenticity**: Verification by cultural consultants
-3. **Technical Feasibility**: Assessment by development team
+1. **Technical Review**: Development team validates setup procedures
+2. **Stakeholder Review**: Business and technical team input on requirements
+3. **Cultural Authenticity**: Verification by cultural consultants
 4. **User Validation**: Feedback from student and parent community
 
 ### **Living Documents**
@@ -75,6 +93,11 @@ These documents are designed to evolve with the project:
 ---
 
 ## 📞 **Document Contacts**
+
+### **Environment Setup**
+- **Owner**: Development Team
+- **Contributors**: DevOps, system administrators
+- **Review Cycle**: As needed for technical changes
 
 ### **Business Requirements**
 - **Owner**: TandavaLasya Leadership Team
@@ -96,16 +119,17 @@ These documents are designed to evolve with the project:
 - **Cultural Guidelines**: Authenticity and respectful representation standards
 
 ### **External References**
+- **EmailJS Documentation**: https://www.emailjs.com/docs/
 - **WCAG 2.1 Guidelines**: Web accessibility standards
 - **Bharatanatyam Cultural Resources**: Traditional dance education materials
 - **Industry Best Practices**: Dance education and cultural organization standards
 
 ---
 
-**Last Updated**: December 2024  
-**Next Review**: March 2025  
-**Document Version**: 1.0
+**Last Updated**: June 2025  
+**Next Review**: September 2025  
+**Document Version**: 1.1
 
 ---
 
-*These documentation files serve as the foundation for TandavaLasya's digital platform development, ensuring cultural authenticity, technical excellence, and exceptional user experiences that honor the tradition of Bharatanatyam while embracing modern technology.* # TandavaLasya - Project Documentation
+*These documentation files serve as the foundation for TandavaLasya's digital platform development, ensuring cultural authenticity, technical excellence, and exceptional user experiences that honor the tradition of Bharatanatyam while embracing modern technology.*

@@ -268,13 +268,83 @@ npm run preview
 ```
 
 ### Deployment Checklist
-- [ ] Environment variables configured
-- [ ] Images optimized and compressed
-- [ ] EmailJS service configured
-- [ ] Contact form tested
-- [ ] All pages responsive
-- [ ] Accessibility verified
-- [ ] Performance optimized
+
+#### 1. Environment Variables Configured
+**What to do**: Set up EmailJS environment variables for contact form functionality
+- Create EmailJS account at [https://dashboard.emailjs.com/](https://dashboard.emailjs.com/)
+- Create email service (Gmail, Outlook, etc.)
+- Create user confirmation and admin notification templates
+- In **Netlify**: Go to Site Settings → Environment Variables, add:
+  - `VITE_EMAILJS_PUBLIC_KEY` = Your EmailJS public key
+  - `VITE_EMAILJS_SERVICE_ID` = Your EmailJS service ID  
+  - `VITE_EMAILJS_USER_TEMPLATE` = User confirmation template ID
+  - `VITE_EMAILJS_ADMIN_TEMPLATE` = Admin notification template ID
+- In **Vercel**: Go to Project Settings → Environment Variables, add same variables
+- **Test**: Deploy and verify contact form sends emails without console warnings
+
+#### 2. Images Optimized and Compressed
+**What to do**: Optimize all images for web performance
+- **Compress images**: Use tools like TinyPNG, ImageOptim, or Squoosh
+- **Responsive sizes**: Create multiple sizes for different viewports
+- **Format optimization**: Use WebP format with fallbacks, AVIF for modern browsers
+- **Lazy loading**: Ensure all images use `loading="lazy"` attribute
+- **Check locations**: `public/images/`, inline images in components
+- **Target metrics**: Images should be <200KB, hero images <500KB
+- **Test**: Run Lighthouse audit, aim for 90+ performance score
+
+#### 3. EmailJS Service Configured
+**What to do**: Set up email service integration
+- **Templates created**: User confirmation + admin notification templates
+- **Service connected**: Email service (Gmail/Outlook) properly linked
+- **Rate limiting**: Set appropriate usage limits in EmailJS dashboard
+- **Domain verification**: Add your domain to EmailJS allowed origins
+- **Test thoroughly**: Submit contact form from production URL
+- **Backup plan**: Have fallback email service ready
+
+#### 4. Contact Form Tested
+**What to do**: End-to-end testing of contact functionality
+- **Functional testing**: Submit with valid/invalid data
+- **Email delivery**: Verify both user and admin emails arrive
+- **Error handling**: Test network failures, invalid inputs
+- **Responsive design**: Test on mobile, tablet, desktop
+- **Accessibility**: Test with screen readers, keyboard navigation
+- **Rate limiting**: Verify spam protection works
+- **Cross-browser**: Test on Chrome, Firefox, Safari, Edge
+
+#### 5. All Pages Responsive
+**What to do**: Verify responsive design across all pages and components
+- **Breakpoints tested**: Mobile (320px+), Tablet (768px+), Desktop (1024px+)
+- **Navigation**: Menu functions properly on all screen sizes
+- **Content layout**: Text readable, images properly sized
+- **Interactive elements**: Buttons, forms, animations work on touch devices
+- **Performance**: Smooth scrolling and transitions on all devices
+- **Tools to use**: Browser dev tools, real device testing
+- **Pages to check**: Home, About, Classes, Schedule, Gallery, Contact
+
+#### 6. Accessibility Verified
+**What to do**: Ensure WCAG 2.1 AA compliance
+- **Keyboard navigation**: Tab through all interactive elements
+- **Screen reader testing**: Use NVDA, JAWS, or VoiceOver
+- **Color contrast**: Minimum 4.5:1 ratio for normal text, 3:1 for large text
+- **Alt text**: All images have descriptive alt attributes
+- **Form labels**: All form inputs properly labeled
+- **Focus indicators**: Visible focus states for all interactive elements
+- **ARIA labels**: Proper semantic markup and ARIA attributes
+- **Tools**: axe DevTools, Lighthouse accessibility audit, WAVE
+
+#### 7. Performance Optimized
+**What to do**: Achieve optimal loading and runtime performance
+- **Lighthouse audit**: Aim for 90+ Performance score
+- **Core Web Vitals**: 
+  - Largest Contentful Paint (LCP) < 2.5s
+  - First Input Delay (FID) < 100ms
+  - Cumulative Layout Shift (CLS) < 0.1
+- **Bundle analysis**: Use `npm run build` and analyze bundle size
+- **Code splitting**: Lazy load routes and components
+- **Caching**: Set appropriate cache headers
+- **CDN**: Use CDN for static assets
+- **Minification**: CSS, JS, and HTML properly minified
+- **Test tools**: GTmetrix, PageSpeed Insights, WebPageTest
 
 ### Cursor Prompts
 ```

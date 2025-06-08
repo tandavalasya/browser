@@ -62,11 +62,12 @@ function useQuery() {
 /**
  * Form validation utility
  * Centralizes all validation logic following DRY principle
+ * Note: Domain validation is handled by EmailService during submission
  */
 class ContactFormValidator {
   static validateName(name) {
-    if (!name || name.trim().length < 2) {
-      return 'Name must be at least 2 characters long';
+    if (!name || name.trim().length === 0) {
+      return 'Name is required';
     }
     if (name.length > 100) {
       return 'Name must be less than 100 characters';
@@ -89,8 +90,8 @@ class ContactFormValidator {
   }
 
   static validateMessage(message) {
-    if (!message || message.trim().length < 10) {
-      return 'Message must be at least 10 characters long';
+    if (!message || message.trim().length < 3) {
+      return 'Message must be at least 3 characters long';
     }
     if (message.length > 2000) {
       return 'Message must be less than 2000 characters';
@@ -99,29 +100,39 @@ class ContactFormValidator {
   }
 
   static validateLocation(location) {
-    if (!location) {
+    if (!location || location.trim().length === 0) {
       return 'Please select a location';
     }
-    if (!locationsData.includes(location)) {
-      return 'Please select a valid location';
-    }
+    // More permissive - allow any location selection
     return null;
   }
 
   static validateForm(formData) {
     const errors = {};
     
-    const nameError = this.validateName(formData.name);
-    if (nameError) errors.name = nameError;
+    // Simplified validation - check for minimal requirements only
+    
+    // Name: just needs to exist and not be empty
+    if (!formData.name || formData.name.trim().length === 0) {
+      errors.name = 'Name is required';
+    }
 
-    const emailError = this.validateEmail(formData.email);
-    if (emailError) errors.email = emailError;
+    // Email: basic format check only  
+    if (!formData.email || formData.email.trim().length === 0) {
+      errors.email = 'Email is required';
+    } else if (!formData.email.includes('@') || !formData.email.includes('.')) {
+      errors.email = 'Please enter a valid email address';
+    }
 
-    const messageError = this.validateMessage(formData.message);
-    if (messageError) errors.message = messageError;
+    // Message: very short minimum
+    if (!formData.message || formData.message.trim().length < 3) {
+      errors.message = 'Message must be at least 3 characters long';
+    }
 
-    const locationError = this.validateLocation(formData.location);
-    if (locationError) errors.location = locationError;
+    // Location: just needs to be selected
+    if (!formData.location || formData.location.trim().length === 0) {
+      errors.location = 'Please select a location';
+    }
 
     return {
       isValid: Object.keys(errors).length === 0,
@@ -243,7 +254,34 @@ function ContactForm({ prefillMessage }) {
   }, [formData, emailService]);
 
   const isFormValid = useMemo(() => {
-    return ContactFormValidator.validateForm(formData).isValid;
+    try {
+      const validation = ContactFormValidator.validateForm(formData);
+      // Debug log to console for easier debugging
+      console.log('🔍 Form validation debug:', {
+        isValid: validation.isValid,
+        errors: validation.errors,
+        formData: formData,
+        hasName: !!formData.name && formData.name.trim().length > 0,
+        hasEmail: !!formData.email && formData.email.trim().length > 0,
+        hasMessage: !!formData.message && formData.message.trim().length > 0,
+        hasLocation: !!formData.location && formData.location.trim().length > 0
+      });
+      
+      logger.debug('Form validation result', {
+        isValid: validation.isValid,
+        errors: validation.errors,
+        formData: { 
+          name: formData.name.length > 0,
+          email: formData.email.length > 0,
+          message: formData.message.length,
+          location: formData.location.length > 0
+        }
+      });
+      return validation.isValid;
+    } catch (error) {
+      logger.error('Form validation error', { error: error.message });
+      return false;
+    }
   }, [formData]);
 
   return (
@@ -383,6 +421,7 @@ function ContactForm({ prefillMessage }) {
           <motion.button
             type="submit"
             disabled={isSubmitting || !isFormValid}
+            onClick={() => console.log('🔴 Button click - isFormValid:', isFormValid, 'formData:', formData)}
             className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-200 ${
               isSubmitting || !isFormValid
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'

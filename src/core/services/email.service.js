@@ -33,21 +33,39 @@ class EmailConfigManager {
 
   loadConfiguration() {
     try {
-      // Try to load production configuration
-      const config = require('../../config/emailjs.json');
-      logger.info('EmailJS configuration loaded successfully');
+      // Try to load production configuration from static import
+      const config = {
+        publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'test-key',
+        serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID || 'test-service',
+        userTemplateId: import.meta.env.VITE_EMAILJS_USER_TEMPLATE || 'test-user-template',
+        adminTemplateId: import.meta.env.VITE_EMAILJS_ADMIN_TEMPLATE || 'test-admin-template',
+        allowedDomains: ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'example.com', 'localhost'],
+        rateLimit: {
+          maxRequests: 5,
+          windowMs: 60000 // 1 minute
+        }
+      };
+
+      if (config.publicKey !== 'test-key') {
+        logger.info('EmailJS configuration loaded from environment variables');
+      } else {
+        logger.info('EmailJS running in development mode - contact form will simulate email sending', {
+          note: 'To enable email sending, configure environment variables as described in docs/ENVIRONMENT_SETUP.md'
+        });
+      }
+      
       return config;
     } catch (error) {
       // Fallback configuration for development/testing
-      logger.warn('EmailJS configuration not found, using fallback configuration', {
+      logger.warn('EmailJS configuration error, using fallback configuration', {
         error: error.message
       });
       
       return {
-        publicKey: process.env.REACT_APP_EMAILJS_PUBLIC_KEY || 'test-key',
-        serviceId: process.env.REACT_APP_EMAILJS_SERVICE_ID || 'test-service',
-        userTemplateId: process.env.REACT_APP_EMAILJS_USER_TEMPLATE || 'test-user-template',
-        adminTemplateId: process.env.REACT_APP_EMAILJS_ADMIN_TEMPLATE || 'test-admin-template',
+        publicKey: 'test-key',
+        serviceId: 'test-service',
+        userTemplateId: 'test-user-template',
+        adminTemplateId: 'test-admin-template',
         allowedDomains: ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'example.com', 'localhost'],
         rateLimit: {
           maxRequests: 5,
@@ -67,7 +85,7 @@ class EmailConfigManager {
         throw new Error('Email service initialization failed');
       }
     } else {
-      logger.warn('EmailJS running in test mode');
+      logger.info('EmailJS running in development mode - contact form will simulate email sending');
     }
   }
 
