@@ -1,13 +1,10 @@
 // Google Places API service for fetching reviews
-const GOOGLE_PLACES_API_KEY = process.env.REACT_APP_GOOGLE_PLACES_API_KEY;
-const PLACE_ID = process.env.REACT_APP_TANDAVALASYA_PLACE_ID;
+import { getPlacesApiUrl } from '../config/googlePlaces';
 
 const fetchGoogleReviews = async () => {
   try {
-    // First, get the place details including reviews
-    const response = await fetch(
-      `https://maps.googleapis.com/maps/api/place/details/json?place_id=${PLACE_ID}&fields=reviews&key=${GOOGLE_PLACES_API_KEY}`
-    );
+    // Get the place details including reviews using the config URL
+    const response = await fetch(getPlacesApiUrl());
     
     if (!response.ok) {
       throw new Error('Failed to fetch reviews');

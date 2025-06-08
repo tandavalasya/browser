@@ -3,6 +3,7 @@ import { motion, useAnimation } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { FaChevronLeft, FaChevronRight, FaGoogle } from 'react-icons/fa';
 import fetchGoogleReviews from '../services/googlePlaces';
+import { GOOGLE_PLACES_CONFIG } from '../config/googlePlaces';
 
 const containerVariants = {
   hidden: {},
@@ -184,7 +185,7 @@ const Home = () => {
                     {review.name}
                     {review.source === 'google' && (
                       <a 
-                        href={`https://www.google.com/maps/place/?q=place_id:${process.env.REACT_APP_TANDAVALASYA_PLACE_ID}`}
+                        href={`https://www.google.com/maps/place/?q=place_id:${GOOGLE_PLACES_CONFIG.PLACE_ID}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-500 hover:text-blue-600 transition-colors"
