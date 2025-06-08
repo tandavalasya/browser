@@ -1,4 +1,5 @@
 {
   "placeId": "ChIJEVt4NMRzkFQRiQ2waSlam8o",
-  "fields": ["reviews", "rating", "user_ratings_total"]
+  "fields": ["reviews", "rating", "user_ratings_total"],
+  "apiKey": "AIzaSyDq2U_m1Pw8asLmg9LWaOYhE4ubDNzxrr0"
 } 

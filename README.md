@@ -69,6 +69,15 @@ The website integrates with Google Places API to display real-time business revi
 - Provides direct links to Google Maps reviews
 - Handles loading states and errors gracefully
 
+## TODO: Future Improvements
+
+### CI/CD and Environment Configuration
+- [ ] Set up proper environment variable handling for CI/CD
+- [ ] Move API keys to environment variables
+- [ ] Add GitHub Actions for automated testing and deployment
+- [ ] Set up staging and production environments
+- [ ] Implement proper secrets management
+
 ## Contributing
 
 1. Fork the repository

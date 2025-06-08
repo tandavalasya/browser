@@ -4,18 +4,8 @@ let apiLoadPromise = null;
 
 export const loadGooglePlacesApi = async () => {
   try {
-    // Load both configs
-    const [staticConfig, envConfig] = await Promise.all([
-      import('../config/googlePlaces.json').then(module => module.default),
-      import('../config/googlePlaces.env.json').then(module => module.default)
-        .catch(() => ({ apiKey: import.meta.env.VITE_GOOGLE_PLACES_API_KEY }))
-    ]);
-
-    // Merge configs
-    const config = {
-      ...staticConfig,
-      apiKey: envConfig.apiKey || import.meta.env.VITE_GOOGLE_PLACES_API_KEY
-    };
+    // Load the config
+    const config = await import('../config/googlePlaces.json').then(module => module.default);
 
     // If API is already loaded, return resolved promise
     if (window.google && window.google.maps && window.google.maps.places) {
