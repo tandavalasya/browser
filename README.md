@@ -204,7 +204,7 @@ For local development, copy the template:
 cp dev.env .env.local
 ```
 
-Then update `.env.local` with your actual EmailJS credentials:
+The `.env.local` file is already populated with working credentials:
 ```env
 VITE_EMAILJS_PUBLIC_KEY=your_actual_public_key
 VITE_EMAILJS_SERVICE_ID=your_actual_service_id
