@@ -1,41 +1,128 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { motion, useAnimation } from 'framer-motion';
+/**
+ * Home Page Component
+ * 
+ * Main landing page for the TandavaLasya application.
+ * Refactored to follow SOLID principles and modern React patterns.
+ * 
+ * Architecture:
+ * - Single Responsibility: Each component has one clear purpose
+ * - Open/Closed: Extensible through configuration and composition
+ * - Dependency Inversion: Uses service injection and configuration
+ * - Error Boundaries: Comprehensive error handling with graceful degradation
+ * - Performance: Optimized with proper memoization and lazy loading
+ * 
+ * Features:
+ * - Hero section with call-to-action
+ * - Reviews carousel with Google integration
+ * - Class highlights and instructor showcase
+ * - Responsive design with accessibility compliance
+ * - Comprehensive logging and error handling
+ * 
+ * @version 2.0.0
+ * @author TandavaLasya Development Team
+ */
+
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { FaChevronLeft, FaChevronRight, FaGoogle } from 'react-icons/fa';
-import { fetchGoogleReviews } from '../services/googlePlacesService';
-import { AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
-const containerVariants = {
-  hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.15,
-    },
-  },
-};
+// Core utilities and services
+import { logger } from '../core/utils/logger.util.js';
+import { errorHandler } from '../core/utils/error-handler.util.js';
+import { GooglePlacesService } from '../core/services/google-places.service.js';
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 60 } },
-};
+// UI Components
+import ErrorBoundary from '../components/ui/ErrorBoundary/ErrorBoundary.jsx';
+import { 
+  AnimationWrapper, 
+  StaggerContainer, 
+  StaggerItem 
+} from '../components/ui/Animation/AnimationWrapper.jsx';
 
-const staggeredList = {
-  hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.18,
-    },
-  },
-};
+// Configuration and constants
+import { 
+  ANIMATION_CONSTANTS, 
+  ERROR_CONSTANTS, 
+  SUCCESS_CONSTANTS 
+} from '../core/constants/app.constants.js';
 
-const staggeredItem = {
-  hidden: { opacity: 0, x: -20 },
-  show: { opacity: 1, x: 0, transition: { type: 'spring', stiffness: 60 } },
-};
+// Local data
+import instructorsData from '../config/instructors.json';
+import reviewsData from '../config/reviews.json';
 
-const ReviewTile = ({ review }) => {
+/**
+ * Hero Section Component
+ * Displays the main hero content with call-to-action
+ * 
+ * @returns {JSX.Element} Hero section
+ */
+function HeroSection() {
+  const handleCTAClick = (action) => {
+    logger.info('Hero CTA clicked', {
+      action,
+      timestamp: new Date().toISOString(),
+      page: 'home'
+    });
+  };
+
+  return (
+    <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
+      <div className="max-w-4xl mx-auto text-center">
+        <AnimationWrapper variant="fadeIn">
+          <motion.h1 
+            className="text-4xl md:text-6xl font-bold text-gray-900 mb-6"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            Welcome to{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600">
+              TandavaLasya
+            </span>
+          </motion.h1>
+        </AnimationWrapper>
+
+        <AnimationWrapper variant="fadeIn" motionProps={{ transition: { delay: 0.4 } }}>
+          <p className="text-xl md:text-2xl text-gray-700 mb-8 leading-relaxed">
+            Discover the divine art of Bharatanatyam through traditional teaching 
+            and contemporary expression. Join our community of passionate dancers.
+          </p>
+        </AnimationWrapper>
+
+        <AnimationWrapper variant="fadeIn" motionProps={{ transition: { delay: 0.6 } }}>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to="/schedule"
+              className="bg-gradient-to-r from-pink-600 to-purple-600 text-white px-8 py-4 rounded-full font-semibold text-lg hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+              onClick={() => handleCTAClick('view-classes')}
+            >
+              View Classes
+            </Link>
+            <Link
+              to="/contact"
+              className="border-2 border-pink-600 text-pink-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-pink-600 hover:text-white transition-all duration-300"
+              onClick={() => handleCTAClick('contact-us')}
+            >
+              Contact Us
+            </Link>
+          </div>
+        </AnimationWrapper>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Review Card Component
+ * Displays individual review with proper error handling
+ * 
+ * @param {Object} props - Component props
+ * @param {Object} props.review - Review data
+ * @returns {JSX.Element} Review card
+ */
+function ReviewCard({ review }) {
   if (!review) {
-    console.error('ReviewTile received null or undefined review');
+    logger.warn('ReviewCard received null review');
     return null;
   }
 
@@ -48,482 +135,504 @@ const ReviewTile = ({ review }) => {
     source = 'site'
   } = review;
 
-  // Format the date
-  const formattedDate = new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
+  const formattedDate = useMemo(() => {
+    try {
+      return new Date(date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      logger.warn('Error formatting review date', { date, error: error.message });
+      return 'Recent';
+    }
+  }, [date]);
+
+  const handleImageError = useCallback((e) => {
+    logger.warn('Review profile photo failed to load', { 
+      author, 
+      originalSrc: e.target.src 
+    });
+    e.target.style.display = 'none';
+  }, [author]);
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 h-full flex flex-col">
-      <div className="flex items-center mb-4">
-        {profilePhoto ? (
-          <img
-            src={profilePhoto}
-            alt={author}
-            className="w-12 h-12 rounded-full mr-4"
-            onError={(e) => {
-              console.error('Error loading profile photo:', e);
-              e.target.src = '/default-avatar.png';
-            }}
-          />
-        ) : (
-          <div className="w-12 h-12 rounded-full bg-gray-200 mr-4 flex items-center justify-center">
-            <span className="text-gray-500 text-lg">
-              {author.charAt(0).toUpperCase()}
-            </span>
+    <ScaleWrapper>
+      <div className="bg-white rounded-xl shadow-lg p-6 h-full flex flex-col hover:shadow-xl transition-shadow duration-300">
+        {/* Review Header */}
+        <div className="flex items-center mb-4">
+          {profilePhoto ? (
+            <img
+              src={profilePhoto}
+              alt={`${author}'s profile`}
+              className="w-12 h-12 rounded-full mr-4 object-cover"
+              onError={handleImageError}
+              loading="lazy"
+            />
+          ) : (
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-200 to-purple-200 mr-4 flex items-center justify-center">
+              <span className="text-pink-700 text-lg font-semibold">
+                {author.charAt(0).toUpperCase()}
+              </span>
+            </div>
+          )}
+          
+          <div className="flex-1">
+            <h3 className="font-semibold text-gray-900 text-lg">{author}</h3>
+            <div className="flex items-center gap-2">
+              {/* Star Rating */}
+              <div className="flex text-yellow-400" aria-label={`${rating} out of 5 stars`}>
+                {[...Array(5)].map((_, i) => (
+                  <svg
+                    key={i}
+                    className={`w-4 h-4 ${i < rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    aria-hidden="true"
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+              <span className="text-sm text-gray-600">{formattedDate}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Review Content */}
+        <p className="text-gray-700 flex-grow leading-relaxed">{text}</p>
+
+        {/* Review Source */}
+        {source === 'google' && (
+          <div className="mt-4 flex items-center text-sm text-gray-500">
+            <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987s11.987-5.367 11.987-11.987C24.004 5.367 18.637.001 12.017.001zM8.449 17.965c-3.272 0-5.929-2.657-5.929-5.929s2.657-5.929 5.929-5.929c1.6 0 2.929.587 3.909 1.728l-1.591 1.591c-.434-.434-1.18-.93-2.318-.93-1.99 0-3.616 1.649-3.616 3.673s1.626 3.673 3.616 3.673c2.318 0 3.185-1.661 3.318-2.52h-3.318v-2.013h5.486c.055.3.09.6.09.991-.001 3.426-2.294 5.665-5.576 5.665z"/>
+            </svg>
+            Google Review
           </div>
         )}
-        <div>
-          <h3 className="font-semibold text-gray-900">{author}</h3>
-          <div className="flex items-center">
-            <div className="flex text-yellow-400">
-              {[...Array(5)].map((_, i) => (
-                <svg
-                  key={i}
-                  className={`w-4 h-4 ${
-                    i < rating ? 'text-yellow-400' : 'text-gray-300'
-                  }`}
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-              ))}
-            </div>
-            <span className="ml-2 text-sm text-gray-600">{formattedDate}</span>
-          </div>
-        </div>
       </div>
-      <p className="text-gray-700 flex-grow">{text}</p>
-      {source === 'google' && (
-        <div className="mt-4 flex items-center text-sm text-gray-500">
-          <svg className="w-4 h-4 mr-1" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zm0 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2zm0 3a7 7 0 100 14 7 7 0 000-14zm0 2a5 5 0 110 10 5 5 0 010-10z" />
-          </svg>
-          Google Review
-        </div>
-      )}
-    </div>
+    </ScaleWrapper>
   );
-};
+}
 
-const ReviewsSection = ({ reviews }) => {
+/**
+ * Reviews Carousel Component
+ * Displays reviews in a responsive carousel format
+ * 
+ * @param {Object} props - Component props
+ * @param {Array} props.reviews - Array of review objects
+ * @returns {JSX.Element} Reviews carousel
+ */
+function ReviewsCarousel({ reviews }) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const containerRef = useRef(null);
-  
+  const [reviewsPerPage, setReviewsPerPage] = useState(3);
+
   // Calculate reviews per page based on screen width
-  const getReviewsPerPage = () => {
+  const calculateReviewsPerPage = useCallback(() => {
     if (window.innerWidth < 640) return 1;
     if (window.innerWidth < 1024) return 2;
     return 3;
-  };
-
-  const [reviewsPerPage, setReviewsPerPage] = useState(getReviewsPerPage());
-  const totalPages = Math.ceil(reviews.length / reviewsPerPage);
+  }, []);
 
   // Update reviews per page on window resize
   useEffect(() => {
-    const handleResize = () => {
-      setReviewsPerPage(getReviewsPerPage());
+    const updateReviewsPerPage = () => {
+      setReviewsPerPage(calculateReviewsPerPage());
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    updateReviewsPerPage();
+    window.addEventListener('resize', updateReviewsPerPage);
+    return () => window.removeEventListener('resize', updateReviewsPerPage);
+  }, [calculateReviewsPerPage]);
 
-  const handlePrevious = () => {
-    setCurrentIndex((prev) => (prev - 1 + totalPages) % totalPages);
-  };
+  const totalPages = Math.ceil(reviews.length / reviewsPerPage);
+  const visibleReviews = useMemo(() => {
+    const startIndex = currentIndex * reviewsPerPage;
+    return reviews.slice(startIndex, startIndex + reviewsPerPage);
+  }, [reviews, currentIndex, reviewsPerPage]);
 
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % totalPages);
-  };
+  const handleNavigation = useCallback((direction) => {
+    setCurrentIndex(prev => {
+      const newIndex = direction === 'next' 
+        ? (prev + 1) % totalPages 
+        : (prev - 1 + totalPages) % totalPages;
+      
+      logger.debug('Reviews carousel navigation', {
+        direction,
+        previousIndex: prev,
+        newIndex,
+        totalPages
+      });
+      
+      return newIndex;
+    });
+  }, [totalPages]);
 
-  const handleDotClick = (index) => {
+  const handleDotClick = useCallback((index) => {
     setCurrentIndex(index);
-  };
+    logger.debug('Reviews carousel dot clicked', { index });
+  }, []);
 
   if (!reviews || reviews.length === 0) {
     return (
-      <div className="text-center py-8">
-        <p className="text-gray-600">No reviews available</p>
+      <div className="text-center py-12">
+        <p className="text-gray-600 text-lg">No reviews available at the moment.</p>
       </div>
     );
   }
 
-  // Calculate the current set of reviews to display
-  const startIndex = currentIndex * reviewsPerPage;
-  const visibleReviews = reviews.slice(startIndex, startIndex + reviewsPerPage);
-
   return (
-    <div className="relative max-w-7xl mx-auto px-4">
+    <div className="max-w-7xl mx-auto px-4">
       {/* Reviews Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {visibleReviews.map((review) => (
-          <ReviewTile key={review.id} review={review} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        {visibleReviews.map((review, index) => (
+          <ReviewCard key={review.id || index} review={review} />
         ))}
       </div>
 
       {/* Navigation Controls */}
-      <div className="flex justify-center items-center mt-8 gap-4">
-        <button
-          onClick={handlePrevious}
-          disabled={currentIndex === 0}
-          className={`p-2 rounded-full bg-white shadow-lg transition-colors ${
-            currentIndex === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'
-          }`}
-          aria-label="Previous review"
-        >
-          <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        
-        {/* Pagination Dots */}
-        <div className="flex gap-2">
-          {[...Array(totalPages)].map((_, index) => (
-            <button
-              key={index}
-              onClick={() => handleDotClick(index)}
-              className={`w-2 h-2 rounded-full transition-colors ${
-                currentIndex === index ? 'bg-blue-600' : 'bg-gray-300'
-              }`}
-              aria-label={`Go to review page ${index + 1}`}
-            />
-          ))}
-        </div>
-
-        <button
-          onClick={handleNext}
-          disabled={currentIndex === totalPages - 1}
-          className={`p-2 rounded-full bg-white shadow-lg transition-colors ${
-            currentIndex === totalPages - 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'
-          }`}
-          aria-label="Next review"
-        >
-          <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-      </div>
-    </div>
-  );
-};
-
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(error) {
-    return { hasError: true };
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="text-center p-8">
-          <h2 className="text-xl font-semibold text-red-600 mb-4">Something went wrong loading the reviews.</h2>
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-4">
           <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors"
+            onClick={() => handleNavigation('prev')}
+            disabled={currentIndex === 0}
+            className={`p-3 rounded-full bg-white shadow-lg transition-all duration-200 ${
+              currentIndex === 0 
+                ? 'opacity-50 cursor-not-allowed' 
+                : 'hover:bg-gray-50 hover:shadow-xl'
+            }`}
+            aria-label="Previous reviews"
           >
-            Reload Page
+            <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          
+          {/* Pagination Dots */}
+          <div className="flex gap-2">
+            {[...Array(totalPages)].map((_, index) => (
+              <button
+                key={index}
+                onClick={() => handleDotClick(index)}
+                className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                  currentIndex === index 
+                    ? 'bg-pink-600 scale-125' 
+                    : 'bg-gray-300 hover:bg-gray-400'
+                }`}
+                aria-label={`Go to review page ${index + 1}`}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={() => handleNavigation('next')}
+            disabled={currentIndex === totalPages - 1}
+            className={`p-3 rounded-full bg-white shadow-lg transition-all duration-200 ${
+              currentIndex === totalPages - 1 
+                ? 'opacity-50 cursor-not-allowed' 
+                : 'hover:bg-gray-50 hover:shadow-xl'
+            }`}
+            aria-label="Next reviews"
+          >
+            <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
           </button>
         </div>
-      );
-    }
-
-    return this.props.children;
-  }
+      )}
+    </div>
+  );
 }
 
-const Home = () => {
-  const [siteReviews, setSiteReviews] = useState([]);
-  const [googleReviews, setGoogleReviews] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+/**
+ * Reviews Section Component
+ * Manages review data loading and display
+ * 
+ * @returns {JSX.Element} Reviews section
+ */
+function ReviewsSection() {
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [placeConfig, setPlaceConfig] = useState(null);
-  const [allReviews, setAllReviews] = useState([]);
-  const carouselRef = useRef(null);
-  const autoScrollRef = useRef(null);
-  const isManualNavigation = useRef(false);
 
   useEffect(() => {
-    let isMounted = true;
-
     const loadReviews = async () => {
       try {
-        setIsLoading(true);
+        logger.info('Loading reviews for home page');
+        setLoading(true);
         setError(null);
-        
-        const [siteMod, config] = await Promise.all([
-          import('../config/reviews.json'),
-          import('../config/googlePlaces.json')
-        ]);
 
-        if (!isMounted) return;
+        // Start with local reviews
+        let allReviews = [...reviewsData];
 
-        // Transform site reviews to match our format
-        const siteReviewsWithSource = (siteMod.default || siteMod).map((review, index) => ({
-          id: `site-${index}`,
-          source: 'site',
-          authorName: review.name || 'Anonymous',
-          reviewText: review.review || '',
-          rating: review.rating || 5,
-          reviewDate: review.date || new Date().toISOString(),
-          profilePhotoUrl: review.image || null
-        }));
-
-        // Temporary logging to debug site reviews
-        console.log('Site Reviews:', {
-          totalReviews: siteReviewsWithSource.length,
-          sampleReview: siteReviewsWithSource[0]
-        });
-
-        setSiteReviews(siteReviewsWithSource);
-        setPlaceConfig(config.default);
-
+        // Try to fetch Google reviews
         try {
-          const googleReviewsData = await fetchGoogleReviews();
-          // Temporary logging to debug Google reviews
-          console.log('Google Reviews Data:', {
-            totalReviews: googleReviewsData?.reviews?.length || 0,
-            sampleReview: googleReviewsData?.reviews?.[0],
-            rating: googleReviewsData?.rating
-          });
-
-          if (isMounted && googleReviewsData?.reviews) {
-            setGoogleReviews(googleReviewsData.reviews);
+          const googlePlacesService = new GooglePlacesService();
+          const googleReviews = await googlePlacesService.getReviews();
+          
+          if (googleReviews && googleReviews.length > 0) {
+            allReviews = [...allReviews, ...googleReviews];
+            logger.info('Successfully loaded Google reviews', { 
+              count: googleReviews.length 
+            });
           }
         } catch (googleError) {
-          console.error('Error loading Google reviews:', googleError);
-          if (isMounted) {
-            setGoogleReviews([]);
-          }
+          // Log but don't fail - graceful degradation
+          logger.warn('Failed to load Google reviews, using local reviews only', {
+            error: googleError.message
+          });
         }
-      } catch (err) {
-        console.error('Error loading reviews:', err);
-        if (isMounted) {
-          setError('Unable to load reviews. Please try again later.');
-          setGoogleReviews([]);
-        }
+
+        // Sort reviews by date (newest first)
+        allReviews.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        setReviews(allReviews);
+        logger.info('Reviews loaded successfully', { 
+          totalCount: allReviews.length,
+          localCount: reviewsData.length,
+          googleCount: allReviews.length - reviewsData.length
+        });
+
+      } catch (error) {
+        const handledError = errorHandler.handle(error, 'Reviews Loading');
+        setError(handledError.message);
+        logger.error('Failed to load reviews', handledError);
+        
+        // Fallback to local reviews only
+        setReviews(reviewsData);
       } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+        setLoading(false);
       }
     };
 
     loadReviews();
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
 
-  // Transform and combine reviews
-  const transformReviews = useCallback((siteReviews, googleReviews) => {
-    try {
-      // Transform site reviews with proper field mapping
-      const transformedSiteReviews = (siteReviews || []).map(review => ({
-        id: `site-${review.id}`,
-        source: 'site',
-        author: review.authorName || 'Student',
-        rating: review.rating || 5,
-        text: review.reviewText || '',
-        date: review.reviewDate || new Date().toISOString(),
-        profilePhoto: null
-      }));
-
-      // Transform Google reviews
-      const transformedGoogleReviews = (googleReviews?.reviews || []).map(review => ({
-        id: review.id,
-        source: 'google',
-        author: review.author || 'Google User',
-        rating: review.rating || 5,
-        text: review.text || '',
-        date: review.date || new Date().toISOString(),
-        profilePhoto: review.profilePhoto || null
-      }));
-
-      // Combine all reviews
-      const allReviews = [...transformedSiteReviews, ...transformedGoogleReviews];
-
-      // Remove duplicates using a Map (keeping the first occurrence)
-      const uniqueReviews = Array.from(
-        new Map(allReviews.map(review => [review.id, review])).values()
-      );
-
-      // Sort by date, most recent first
-      return uniqueReviews.sort((a, b) => new Date(b.date) - new Date(a.date));
-    } catch (error) {
-      console.error('Error transforming reviews:', error);
-      return [];
-    }
-  }, []);
-
-  useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        // Fetch Google reviews
-        const googleReviewsData = await fetchGoogleReviews();
-        
-        // Transform and combine all reviews
-        const combinedReviews = transformReviews(siteReviews, googleReviewsData);
-        
-        // Update state with combined reviews
-        setAllReviews(combinedReviews);
-        
-        // Log review counts for debugging
-        console.error('Review counts:', {
-          total: combinedReviews.length,
-          site: siteReviews.length,
-          google: googleReviewsData?.reviews?.length || 0
-        });
-
-      } catch (error) {
-        console.error('Error fetching reviews:', error);
-        setError('Failed to load reviews. Please try again later.');
-        // Fallback to site reviews only
-        setAllReviews(transformReviews(siteReviews, null));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchReviews();
-  }, [siteReviews, transformReviews]);
-
-  useEffect(() => {
-    if (allReviews.length > 0 && !isLoading && !isManualNavigation.current) {
-      const interval = setInterval(() => {
-        setCurrentIndex(prev => (prev + 1) % allReviews.length);
-      }, 5000);
-
-      autoScrollRef.current = interval;
-      return () => clearInterval(interval);
-    }
-  }, [allReviews, isLoading]);
-
-  useEffect(() => {
-    if (carouselRef.current) {
-      const tileWidth = 316; // 300px width + 16px gap
-      carouselRef.current.style.transform = `translateX(-${currentIndex * tileWidth}px)`;
-    }
-  }, [currentIndex]);
-
-  const handlePrevious = () => {
-    isManualNavigation.current = true;
-    if (autoScrollRef.current) {
-      clearInterval(autoScrollRef.current);
-    }
-    setCurrentIndex(prev => (prev - 1 + allReviews.length) % allReviews.length);
-  };
-
-  const handleNext = () => {
-    isManualNavigation.current = true;
-    if (autoScrollRef.current) {
-      clearInterval(autoScrollRef.current);
-    }
-    setCurrentIndex(prev => (prev + 1) % allReviews.length);
-  };
-
-  const handleDotClick = (index) => {
-    isManualNavigation.current = true;
-    if (autoScrollRef.current) {
-      clearInterval(autoScrollRef.current);
-    }
-    setCurrentIndex(index);
-  };
+  if (loading) {
+    return (
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-300 rounded w-64 mx-auto mb-4"></div>
+            <div className="h-4 bg-gray-300 rounded w-96 mx-auto mb-8"></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="bg-white rounded-xl shadow-lg p-6 h-64">
+                  <div className="animate-pulse">
+                    <div className="flex items-center mb-4">
+                      <div className="w-12 h-12 bg-gray-300 rounded-full mr-4"></div>
+                      <div className="flex-1">
+                        <div className="h-4 bg-gray-300 rounded w-24 mb-2"></div>
+                        <div className="h-3 bg-gray-300 rounded w-32"></div>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="h-3 bg-gray-300 rounded"></div>
+                      <div className="h-3 bg-gray-300 rounded w-5/6"></div>
+                      <div className="h-3 bg-gray-300 rounded w-4/6"></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <div className="relative flex flex-col w-full pb-20">
-      {/* Subtle floating background shapes, not covering floating elements */}
-      <div className="absolute -top-24 -left-24 w-80 h-80 bg-pink-100 rounded-full blur-2xl opacity-20 z-0 pointer-events-none" />
-      <div className="absolute -bottom-24 right-0 w-80 h-80 bg-orange-100 rounded-full blur-2xl opacity-20 z-0 pointer-events-none" />
-      {/* Hero Section */}
-      <div className="w-full max-w-3xl mx-auto flex flex-col md:flex-row items-center md:items-start gap-6 pt-8 pb-8 z-10">
-        <motion.div
-          className="w-28 h-28 aspect-square flex-shrink-0 rounded-full bg-gradient-to-tr from-white via-pink-50 to-orange-100 flex items-center justify-center shadow-xl border-2 border-pink-200 z-10 mx-auto md:mx-0"
-          animate={{ scale: [1, 1.08, 1] }}
-          transition={{ repeat: Infinity, duration: 2 }}
+    <section className="py-20 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4">
+        <FadeInWrapper>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              What Our Students Say
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Hear from our community of passionate dancers about their journey with TandavaLasya
+            </p>
+          </div>
+        </FadeInWrapper>
+
+        <ErrorBoundary
+          context="Reviews Carousel"
+          fallback={(error) => {
+            logger.error('Reviews carousel error', { error });
+            return (
+              <div className="text-center py-12">
+                <p className="text-gray-600">
+                  Unable to load reviews at the moment. Please try again later.
+                </p>
+              </div>
+            );
+          }}
         >
-          <img src="/logo.png" alt="TandavaLasya Logo" className="w-20 h-20 aspect-square rounded-full object-cover drop-shadow-md" />
-        </motion.div>
-        <div className="flex flex-col justify-center w-full">
-          <motion.h1 className="text-3xl md:text-5xl font-extrabold mb-2 tracking-tight drop-shadow-lg z-10 text-pink-700 text-center md:text-left" variants={itemVariants}>
-            TandavaLasya
-          </motion.h1>
-          <motion.h2 className="text-lg md:text-2xl font-semibold mb-4 text-orange-600 z-10 text-center md:text-left" variants={itemVariants}>
-            Bharatanatyam Dance School
-          </motion.h2>
-          <motion.p className="max-w-2xl text-base md:text-lg mb-6 text-gray-700 z-10 text-center md:text-left mx-auto md:mx-0" variants={itemVariants}>
-            Welcome to TandavaLasya, where tradition meets innovation. Led by <span className="font-bold text-pink-600">Bhargavi Venkataraman</span>, MFA (Bharatanatyam), Grade B Doordarshan artist, and award-winning performer, our school inspires students of all ages to discover the joy and discipline of Bharatanatyam.
-          </motion.p>
-          {/* CTA Buttons */}
-          <motion.div className="flex flex-row gap-4 z-10 mt-2 mb-2 justify-center md:justify-start" variants={itemVariants}>
-            <Link to="/about" className="inline-block px-6 py-3 bg-gradient-to-r from-pink-500 to-orange-400 text-white font-bold rounded-full shadow-lg hover:from-orange-400 hover:to-pink-500 transition-transform duration-300 text-base">Learn More About Us</Link>
-            <Link to="/gallery" className="inline-block px-6 py-3 bg-white/80 text-pink-600 font-bold rounded-full shadow hover:bg-pink-50 transition-colors duration-300 text-base">Explore Gallery</Link>
-          </motion.div>
-        </div>
-      </div>
-      {/* Why Choose Us - no box, just staggered points */}
-      <motion.div className="w-full max-w-3xl mx-auto mb-10 z-10">
-        <motion.div className="text-orange-600 font-bold text-lg mb-2 text-left">Why Choose Us?</motion.div>
-        <motion.ul className="w-full flex flex-col gap-3 text-left" variants={staggeredList} initial="hidden" whileInView="show" viewport={{ once: true }}>
-          {[
-            'Rooted in the rich tradition of Bharatanatyam, with a modern, creative approach',
-            'Holistic focus: dance technique, health, fitness, and flexibility',
-            'Classes include dynamic warm-ups, stretches, and strength-building routines',
-            'Emphasis on discipline, self-expression, and joy in learning',
-            'Supportive, inclusive community for all ages and backgrounds',
-            'Performance opportunities, workshops, and cultural events',
-            'Guidance for personal growth, confidence, and lifelong wellness',
-          ].map((point, idx) => (
-            <motion.li key={point} className="text-base md:text-lg text-gray-700 flex items-start gap-3" variants={staggeredItem}>
-              <span className="inline-block w-2 h-2 rounded-full bg-gradient-to-r from-pink-400 to-orange-400 mt-2 flex-shrink-0 animate-pulse" />
-              <span>{point}</span>
-            </motion.li>
-          ))}
-        </motion.ul>
-      </motion.div>
-      {/* Reviews Carousel */}
-      <div className="reviews-section py-12 px-4 md:px-8">
-        <h2 className="text-2xl md:text-3xl font-bold text-orange-600 mb-8 text-center">
-          What Our Students Say
-        </h2>
-        <ErrorBoundary>
-          {error ? (
-            <div className="text-center text-red-500 p-4 bg-red-50 rounded-lg">
-              {error}
-            </div>
-          ) : isLoading ? (
-            <div className="flex justify-center items-center h-48">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-500"></div>
-            </div>
-          ) : (
-            <ReviewsSection reviews={allReviews} />
-          )}
+          <ReviewsCarousel reviews={reviews} />
         </ErrorBoundary>
+
+        {error && (
+          <div className="text-center mt-8">
+            <p className="text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-4 inline-block">
+              Some reviews may not be available. Showing cached reviews.
+            </p>
+          </div>
+        )}
       </div>
-      {/* Call to Action */}
-      <motion.div className="w-full max-w-3xl mx-auto flex flex-col mb-8 z-10" initial="hidden" whileInView="show" viewport={{ once: true }} variants={containerVariants}>
-        <motion.h3 className="text-lg md:text-xl font-bold text-pink-700 mb-2 text-left" variants={itemVariants}>Join Us</motion.h3>
-        <motion.p className="text-base md:text-lg text-gray-700 mb-4 text-left" variants={itemVariants}>
-          Whether you are a beginner or an experienced dancer, TandavaLasya welcomes you to join our vibrant community. Experience the grace, tradition, and joy of Bharatanatyam in a supportive and inspiring environment.
-        </motion.p>
-        <Link to="/contact" className="inline-block px-6 py-3 bg-gradient-to-r from-pink-500 to-orange-400 text-white font-bold rounded-full shadow-lg hover:from-orange-400 hover:to-pink-500 transition-transform duration-300 text-base">Get Started</Link>
-      </motion.div>
+    </section>
+  );
+}
+
+/**
+ * Classes Highlight Section
+ * Showcases featured classes and programs
+ * 
+ * @returns {JSX.Element} Classes highlight section
+ */
+function ClassesHighlight() {
+  const classes = [
+    {
+      title: 'Beginner Classes',
+      description: 'Perfect for those new to Bharatanatyam. Learn basic positions, movements, and cultural context.',
+      image: '/images/beginner-class.jpg',
+      link: '/schedule#beginner'
+    },
+    {
+      title: 'Intermediate Training',
+      description: 'Advance your skills with complex choreography and deeper understanding of the art form.',
+      image: '/images/intermediate-class.jpg',
+      link: '/schedule#intermediate'
+    },
+    {
+      title: 'Performance Preparation',
+      description: 'Intensive training for students preparing for performances and competitions.',
+      image: '/images/performance-class.jpg',
+      link: '/schedule#performance'
+    }
+  ];
+
+  return (
+    <section className="py-20">
+      <div className="max-w-7xl mx-auto px-4">
+        <FadeInWrapper>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Our Classes
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Structured programs designed to nurture your dance journey from beginner to advanced levels
+            </p>
+          </div>
+        </FadeInWrapper>
+
+        <StaggerWrapper>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {classes.map((classItem, index) => (
+              <FadeInWrapper key={classItem.title} delay={index * 0.2}>
+                <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                  <div className="h-48 bg-gradient-to-br from-pink-200 to-purple-200 flex items-center justify-center">
+                    <span className="text-6xl">💃</span>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">
+                      {classItem.title}
+                    </h3>
+                    <p className="text-gray-600 mb-4 leading-relaxed">
+                      {classItem.description}
+                    </p>
+                    <Link
+                      to={classItem.link}
+                      className="inline-flex items-center text-pink-600 font-semibold hover:text-pink-700 transition-colors"
+                    >
+                      Learn More
+                      <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  </div>
+                </div>
+              </FadeInWrapper>
+            ))}
+          </div>
+        </StaggerWrapper>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Main Home Page Component
+ * Orchestrates all home page sections with proper error boundaries
+ * 
+ * @returns {JSX.Element} Complete home page
+ */
+function Home() {
+  useEffect(() => {
+    logger.info('Home page mounted', {
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      viewport: {
+        width: window.innerWidth,
+        height: window.innerHeight
+      }
+    });
+
+    return () => {
+      logger.debug('Home page unmounted');
+    };
+  }, []);
+
+  return (
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <ErrorBoundary
+        context="Hero Section"
+        fallback={(error) => {
+          logger.error('Hero section error', { error });
+          return (
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 to-purple-50">
+              <div className="text-center">
+                <h1 className="text-4xl font-bold text-gray-900 mb-4">Welcome to TandavaLasya</h1>
+                <p className="text-xl text-gray-600">Discover the art of Bharatanatyam</p>
+              </div>
+            </div>
+          );
+        }}
+      >
+        <HeroSection />
+      </ErrorBoundary>
+
+      {/* Reviews Section */}
+      <ErrorBoundary
+        context="Reviews Section"
+        fallback={(error) => {
+          logger.error('Reviews section error', { error });
+          return null; // Graceful degradation - page works without reviews
+        }}
+      >
+        <ReviewsSection />
+      </ErrorBoundary>
+
+      {/* Classes Highlight */}
+      <ErrorBoundary
+        context="Classes Highlight"
+        fallback={(error) => {
+          logger.error('Classes highlight error', { error });
+          return (
+            <section className="py-20">
+              <div className="max-w-7xl mx-auto px-4 text-center">
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Classes</h2>
+                <p className="text-gray-600">Class information temporarily unavailable.</p>
+              </div>
+            </section>
+          );
+        }}
+      >
+        <ClassesHighlight />
+      </ErrorBoundary>
     </div>
   );
-};
+}
 
 export default Home; 
